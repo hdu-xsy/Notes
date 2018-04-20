@@ -1,0 +1,1862 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width; initial-scale=1.0; " name="viewport" /><title>Document</title>
+<style>
+@font-face {
+  font-family: octicons-anchor;
+  src: url(data:font/woff;charset=utf-8;base64,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) format('woff');
+}
+
+body {
+  background-color: white;
+}
+
+.markdown-body {
+  min-width: 200px;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px;
+
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  color: #333;
+  overflow: hidden;
+  font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+.markdown-body a {
+  background: transparent;;word-wrap: break-word; word-break: break-all;
+}
+
+.markdown-body a:active,
+.markdown-body a:hover {
+  outline: 0;
+}
+
+.markdown-body strong {
+  font-weight: bold;
+}
+
+.markdown-body h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+.markdown-body img {
+  border: 0;
+}
+
+.markdown-body hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+
+.markdown-body pre {
+  overflow: auto;
+}
+
+.markdown-body code,
+.markdown-body kbd,
+.markdown-body pre {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+.markdown-body input {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+
+.markdown-body html input[disabled] {
+  cursor: default;
+}
+
+.markdown-body input {
+  line-height: normal;
+}
+
+.markdown-body input[type="checkbox"] {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.markdown-body td,
+.markdown-body th {
+  padding: 0;
+}
+
+.markdown-body * {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.markdown-body input {
+  font: 13px/1.4 Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.markdown-body a {
+  color: #4183c4;
+  text-decoration: none;
+}
+
+.markdown-body a:hover,
+.markdown-body a:focus,
+.markdown-body a:active {
+  text-decoration: underline;
+}
+
+.markdown-body hr {
+  height: 0;
+  margin: 15px 0;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.markdown-body hr:before {
+  display: table;
+  content: "";
+}
+
+.markdown-body hr:after {
+  display: table;
+  clear: both;
+  content: "";
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  line-height: 1.1;
+}
+
+.markdown-body h1 {
+  font-size: 30px;
+}
+
+.markdown-body h2 {
+  font-size: 21px;
+}
+
+.markdown-body h3 {
+  font-size: 16px;
+}
+
+.markdown-body h4 {
+  font-size: 14px;
+}
+
+.markdown-body h5 {
+  font-size: 12px;
+}
+
+.markdown-body h6 {
+  font-size: 11px;
+}
+
+.markdown-body blockquote {
+  margin: 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body ol ol,
+.markdown-body ul ol {
+  list-style-type: lower-roman;
+}
+
+.markdown-body ul ul ol,
+.markdown-body ul ol ol,
+.markdown-body ol ul ol,
+.markdown-body ol ol ol {
+  list-style-type: lower-alpha;
+}
+
+.markdown-body dd {
+  margin-left: 0;
+}
+
+.markdown-body code {
+  font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.markdown-body pre {
+  margin-top: 0;
+  margin-bottom: 0;
+  font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.markdown-body kbd {
+  background-color: #e7e7e7;
+  background-image: -webkit-linear-gradient(#fefefe, #e7e7e7);
+  background-image: linear-gradient(#fefefe, #e7e7e7);
+  background-repeat: repeat-x;
+  border-radius: 2px;
+  border: 1px solid #cfcfcf;
+  color: #000;
+  padding: 3px 5px;
+  line-height: 10px;
+  font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  display: inline-block;
+}
+
+.markdown-body>*:first-child {
+  margin-top: 0 !important;
+}
+
+.markdown-body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+.markdown-body .anchor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  padding-right: 6px;
+  padding-left: 30px;
+  margin-left: -30px;
+}
+
+.markdown-body .anchor:focus {
+  outline: none;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  position: relative;
+  margin-top: 1em;
+  margin-bottom: 16px;
+  font-weight: bold;
+  line-height: 1.4;
+}
+
+.markdown-body h1 .octicon-link,
+.markdown-body h2 .octicon-link,
+.markdown-body h3 .octicon-link,
+.markdown-body h4 .octicon-link,
+.markdown-body h5 .octicon-link,
+.markdown-body h6 .octicon-link {
+  display: none;
+  color: #000;
+  vertical-align: middle;
+}
+
+.markdown-body h1:hover .anchor,
+.markdown-body h2:hover .anchor,
+.markdown-body h3:hover .anchor,
+.markdown-body h4:hover .anchor,
+.markdown-body h5:hover .anchor,
+.markdown-body h6:hover .anchor {
+  height: 1em;
+  padding-left: 8px;
+  margin-left: -30px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.markdown-body h1:hover .anchor .octicon-link,
+.markdown-body h2:hover .anchor .octicon-link,
+.markdown-body h3:hover .anchor .octicon-link,
+.markdown-body h4:hover .anchor .octicon-link,
+.markdown-body h5:hover .anchor .octicon-link,
+.markdown-body h6:hover .anchor .octicon-link {
+  display: inline-block;
+}
+
+.markdown-body h1 {
+  padding-bottom: 0.3em;
+  font-size: 2.25em;
+  line-height: 1.2;
+  border-bottom: 1px solid #eee;
+}
+
+.markdown-body h2 {
+  padding-bottom: 0.3em;
+  font-size: 1.75em;
+  line-height: 1.225;
+  border-bottom: 1px solid #eee;
+}
+
+.markdown-body h3 {
+  font-size: 1.5em;
+  line-height: 1.43;
+}
+
+.markdown-body h4 {
+  font-size: 1.25em;
+}
+
+.markdown-body h5 {
+  font-size: 1em;
+}
+
+.markdown-body h6 {
+  font-size: 1em;
+  color: #777;
+}
+
+.markdown-body p,
+.markdown-body blockquote,
+.markdown-body ul,
+.markdown-body ol,
+.markdown-body dl,
+.markdown-body table,
+.markdown-body pre {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.markdown-body hr {
+  height: 4px;
+  padding: 0;
+  margin: 16px 0;
+  background-color: #e7e7e7;
+  border: 0 none;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 2em;
+}
+
+.markdown-body ul ul,
+.markdown-body ul ol,
+.markdown-body ol ol,
+.markdown-body ol ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body li>p {
+  margin-top: 16px;
+}
+
+.markdown-body dl {
+  padding: 0;
+}
+
+.markdown-body dl dt {
+  padding: 0;
+  margin-top: 16px;
+  font-size: 1em;
+  font-style: italic;
+  font-weight: bold;
+}
+
+.markdown-body dl dd {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.markdown-body blockquote {
+  padding: 0 15px;
+  color: #777;
+  border-left: 4px solid #ddd;
+}
+
+.markdown-body blockquote>:first-child {
+  margin-top: 0;
+}
+
+.markdown-body blockquote>:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body table {
+  display: block;
+  width: 100%;
+  overflow: auto;
+  word-break: normal;
+  word-break: keep-all;
+}
+
+.markdown-body table th {
+  font-weight: bold;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+  padding: 6px 13px;
+  border: 1px solid #ddd;
+}
+
+.markdown-body table tr {
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+}
+
+.markdown-body table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.markdown-body code {
+  padding: 0;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(0,0,0,0.04);
+  border-radius: 3px;
+}
+
+.markdown-body code:before,
+.markdown-body code:after {
+  letter-spacing: -0.2em;
+  content: "\00a0";
+}
+
+.markdown-body pre>code {
+  padding: 0;
+  margin: 0;
+  font-size: 100%;
+  word-break: normal;
+  white-space: pre;
+  background: transparent;
+  border: 0;
+}
+
+.markdown-body .highlight {
+  margin-bottom: 16px;
+}
+
+.markdown-body .highlight pre,
+.markdown-body pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f7f7f7;
+  border-radius: 3px;
+}
+
+.markdown-body .highlight pre {
+  margin-bottom: 0;
+  word-break: normal;
+}
+
+.markdown-body pre {
+  word-wrap: normal;
+}
+
+.markdown-body pre code {
+  display: inline;
+  max-width: initial;
+  padding: 0;
+  margin: 0;
+  overflow: initial;
+  line-height: inherit;
+  word-wrap: normal;
+  background-color: transparent;
+  border: 0;
+}
+
+.markdown-body pre code:before,
+.markdown-body pre code:after {
+  content: normal;
+}
+
+.markdown-body .highlight {
+  background: #fff;
+}
+
+.markdown-body .highlight .mf,
+.markdown-body .highlight .mh,
+.markdown-body .highlight .mi,
+.markdown-body .highlight .mo,
+.markdown-body .highlight .il,
+.markdown-body .highlight .m {
+  color: #945277;
+}
+
+.markdown-body .highlight .s,
+.markdown-body .highlight .sb,
+.markdown-body .highlight .sc,
+.markdown-body .highlight .sd,
+.markdown-body .highlight .s2,
+.markdown-body .highlight .se,
+.markdown-body .highlight .sh,
+.markdown-body .highlight .si,
+.markdown-body .highlight .sx,
+.markdown-body .highlight .s1 {
+  color: #df5000;
+}
+
+.markdown-body .highlight .kc,
+.markdown-body .highlight .kd,
+.markdown-body .highlight .kn,
+.markdown-body .highlight .kp,
+.markdown-body .highlight .kr,
+.markdown-body .highlight .kt,
+.markdown-body .highlight .k,
+.markdown-body .highlight .o {
+  font-weight: bold;
+}
+
+.markdown-body .highlight .kt {
+  color: #458;
+}
+
+.markdown-body .highlight .c,
+.markdown-body .highlight .cm,
+.markdown-body .highlight .c1 {
+  color: #998;
+  font-style: italic;
+}
+
+.markdown-body .highlight .cp,
+.markdown-body .highlight .cs {
+  color: #999;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .cs {
+  font-style: italic;
+}
+
+.markdown-body .highlight .n {
+  color: #333;
+}
+
+.markdown-body .highlight .na,
+.markdown-body .highlight .nv,
+.markdown-body .highlight .vc,
+.markdown-body .highlight .vg,
+.markdown-body .highlight .vi {
+  color: #008080;
+}
+
+.markdown-body .highlight .nb {
+  color: #0086B3;
+}
+
+.markdown-body .highlight .nc {
+  color: #458;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .no {
+  color: #094e99;
+}
+
+.markdown-body .highlight .ni {
+  color: #800080;
+}
+
+.markdown-body .highlight .ne {
+  color: #990000;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .nf {
+  color: #945277;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .nn {
+  color: #555;
+}
+
+.markdown-body .highlight .nt {
+  color: #000080;
+}
+
+.markdown-body .highlight .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+}
+
+.markdown-body .highlight .gd {
+  color: #000;
+  background-color: #fdd;
+}
+
+.markdown-body .highlight .gd .x {
+  color: #000;
+  background-color: #faa;
+}
+
+.markdown-body .highlight .ge {
+  font-style: italic;
+}
+
+.markdown-body .highlight .gr {
+  color: #aa0000;
+}
+
+.markdown-body .highlight .gh {
+  color: #999;
+}
+
+.markdown-body .highlight .gi {
+  color: #000;
+  background-color: #dfd;
+}
+
+.markdown-body .highlight .gi .x {
+  color: #000;
+  background-color: #afa;
+}
+
+.markdown-body .highlight .go {
+  color: #888;
+}
+
+.markdown-body .highlight .gp {
+  color: #555;
+}
+
+.markdown-body .highlight .gs {
+  font-weight: bold;
+}
+
+.markdown-body .highlight .gu {
+  color: #800080;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .gt {
+  color: #aa0000;
+}
+
+.markdown-body .highlight .ow {
+  font-weight: bold;
+}
+
+.markdown-body .highlight .w {
+  color: #bbb;
+}
+
+.markdown-body .highlight .sr {
+  color: #017936;
+}
+
+.markdown-body .highlight .ss {
+  color: #8b467f;
+}
+
+.markdown-body .highlight .bp {
+  color: #999;
+}
+
+.markdown-body .highlight .gc {
+  color: #999;
+  background-color: #EAF2F5;
+}
+
+.markdown-body .octicon {
+  font: normal normal 16px octicons-anchor;
+  line-height: 1;
+  display: inline-block;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.markdown-body .octicon-link:before {
+  content: '\f05c';
+}
+
+.markdown-body .task-list-item {
+  list-style-type: none;
+}
+
+.markdown-body .task-list-item+.task-list-item {
+  margin-top: 3px;
+}
+
+.markdown-body .task-list-item input {
+  float: left;
+  margin: 0.3em 0 0.25em -1.6em;
+  vertical-align: middle;
+}
+
+/*
+
+github.com style (c) Vasily Polovnyov <vast@whiteants.net>
+
+*/
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #333;
+  background: #f8f8f8;
+  -webkit-text-size-adjust: none;
+}
+
+.hljs-comment,
+.diff .hljs-header {
+  color: #998;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.css .rule .hljs-keyword,
+.hljs-winutils,
+.nginx .hljs-title,
+.hljs-subst,
+.hljs-request,
+.hljs-status {
+  color: #333;
+  font-weight: bold;
+}
+
+.hljs-number,
+.hljs-hexcolor,
+.ruby .hljs-constant {
+  color: #008080;
+}
+
+.hljs-string,
+.hljs-tag .hljs-value,
+.hljs-doctag,
+.tex .hljs-formula {
+  color: #d14;
+}
+
+.hljs-title,
+.hljs-id,
+.scss .hljs-preprocessor {
+  color: #900;
+  font-weight: bold;
+}
+
+.hljs-list .hljs-keyword,
+.hljs-subst {
+  font-weight: normal;
+}
+
+.hljs-class .hljs-title,
+.hljs-type,
+.vhdl .hljs-literal,
+.tex .hljs-command {
+  color: #458;
+  font-weight: bold;
+}
+
+.hljs-tag,
+.hljs-tag .hljs-title,
+.hljs-rule .hljs-property,
+.django .hljs-tag .hljs-keyword {
+  color: #000080;
+  font-weight: normal;
+}
+
+.hljs-attribute,
+.hljs-variable,
+.lisp .hljs-body,
+.hljs-name {
+  color: #008080;
+}
+
+.hljs-regexp {
+  color: #009926;
+}
+
+.hljs-symbol,
+.ruby .hljs-symbol .hljs-string,
+.lisp .hljs-keyword,
+.clojure .hljs-keyword,
+.scheme .hljs-keyword,
+.tex .hljs-special,
+.hljs-prompt {
+  color: #990073;
+}
+
+.hljs-built_in {
+  color: #0086b3;
+}
+
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-pi,
+.hljs-doctype,
+.hljs-shebang,
+.hljs-cdata {
+  color: #999;
+  font-weight: bold;
+}
+
+.hljs-deletion {
+  background: #fdd;
+}
+
+.hljs-addition {
+  background: #dfd;
+}
+
+.diff .hljs-change {
+  background: #0086b3;
+}
+
+.hljs-chunk {
+  color: #aaa;
+}
+
+
+</style>
+
+<style> @media print{ .hljs{overflow: visible; word-wrap: break-word !important;} }</style></head><body><div class="markdown-body yue">
+<h3 id="toc_0">goroutine</h3>
+
+<p>Go语言中有个概念叫做goroutine, 这类似我们熟知的线程,但是更轻。<br/><br/>
+以下的程序,我们串行地去执行两次<code>loop</code>函数:  </p>
+
+<pre><code>func loop() {
+    for i := 0; i &lt; 10; i++ {
+        fmt.Printf(&quot;%d &quot;, i)
+    }
+}
+
+func main() {
+    loop()
+    loop()
+}
+</code></pre>
+
+<p>毫无疑问,输出会是这样的:  </p>
+
+<pre><code>0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+</code></pre>
+
+<p>下面我们把一个loop放在一个goroutine里跑,我们可以使用关键字go来定义并启动一个goroutine:   </p>
+
+<pre><code>func main() {
+    go loop() // 启动一个goroutine
+    loop()
+}
+</code></pre>
+
+<p>这次的输出变成了:  </p>
+
+<pre><code>0 1 2 3 4 5 6 7 8 9
+</code></pre>
+
+<p>可是为什么只输出了一趟呢？明明我们主线跑了一趟,也开了一个goroutine来跑一趟啊。  </p>
+
+<p>原来,在goroutine还没来得及跑loop的时候,主函数已经退出了。  </p>
+
+<p>main函数退出地太快了,我们要想办法阻止它过早地退出,一个办法是让main等待一下:  </p>
+
+<pre><code>func main() {
+    go loop()
+    loop()
+    time.Sleep(time.Second) // 停顿一秒
+}
+</code></pre>
+
+<p>这次确实输出了两趟,目的达到了。</p>
+
+<p>可是采用等待的办法并不好,如果goroutine在结束的时候,告诉下主线说“Hey, 我要跑完了！”就好了, 即所谓阻塞主线的办法,回忆下我们Python里面等待所有线程执行完毕的写法:  </p>
+
+<pre><code>for thread in threads:
+    thread.join()
+</code></pre>
+
+<p>是的,我们也需要一个类似<code>join</code>的东西来阻塞住主线。那就是信道</p>
+
+<h3 id="toc_1">信道</h3>
+
+<p>信道是什么？简单说,是goroutine之间互相通讯的东西。类似我们Unix上的管道（可以在进程间传递消息）,用来goroutine之间发消息和接收消息。其实,就是在做goroutine之间的内存共享。</p>
+
+<p>使用<code>make</code>来建立一个信道:<br/>
+<code><br/>
+var channel chan int = make(chan int)<br/>
+// 或<br/>
+channel := make(chan int)<br/>
+</code><br/>
+那如何向信道存消息和取消息呢？ 一个例子:  </p>
+
+<pre><code>func main() {
+    var messages chan string = make(chan string)
+    go func(message string) {
+        messages &lt;- message // 存消息
+    }(&quot;Ping!&quot;)
+
+    fmt.Println(&lt;-messages) // 取消息
+}
+</code></pre>
+
+<p>默认的,信道的存消息和取消息都是阻塞的 (叫做无缓冲的信道,不过缓冲这个概念稍后了解,先说阻塞的问题)。</p>
+
+<p>也就是说, 无缓冲的信道在取消息和存消息的时候都会挂起当前的goroutine,除非另一端已经准备好。</p>
+
+<p>比如以下的main函数和foo函数:  </p>
+
+<pre><code>var ch chan int = make(chan int)
+
+func foo() {
+    ch &lt;- 0  // 向ch中加数据,如果没有其他goroutine来取走这个数据,那么挂起foo, 直到main函数把0这个数据拿走
+}
+
+func main() {
+    go foo()
+    &lt;- ch // 从ch取数据,如果ch中还没放数据,那就挂起main线,直到foo函数中放数据为止
+}
+</code></pre>
+
+<p>那既然信道可以阻塞当前的goroutine, 那么回到上一部分「goroutine」所遇到的问题「如何让goroutine告诉主线我执行完毕了」 的问题来, 使用一个信道来告诉主线即可:  </p>
+
+<pre><code>var complete chan int = make(chan int)
+
+func loop() {
+    for i := 0; i &lt; 10; i++ {
+        fmt.Printf(&quot;%d &quot;, i)
+    }
+
+    complete &lt;- 0 // 执行完毕了,发个消息
+}
+
+
+func main() {
+    go loop()
+    &lt;- complete // 直到线程跑完, 取到消息. main在此阻塞住
+}
+</code></pre>
+
+<p>如果不用信道来阻塞主线的话,主线就会过早跑完,loop线都没有机会执行</p>
+
+<p>其实,无缓冲的信道永远不会存储数据,只负责数据的流通,为什么这么讲呢？</p>
+
+<ul>
+<li><p>从无缓冲信道取数据,必须要有数据流进来才可以,否则当前线阻塞</p></li>
+<li><p>数据流入无缓冲信道, 如果没有其他goroutine来拿走这个数据,那么当前线阻塞</p></li>
+</ul>
+
+<p>所以,你可以测试下,无论如何,我们测试到的无缓冲信道的大小都是0 (len(channel))</p>
+
+<p>如果信道正有数据在流动,我们还要加入数据,或者信道干涩,我们一直向无数据流入的空信道取数据<br/>
+呢？ 就会引起死锁</p>
+
+<h3 id="toc_2">死锁</h3>
+
+<p>一个死锁的例子:  </p>
+
+<pre><code>func main() {
+    ch := make(chan int)
+    &lt;- ch // 阻塞main goroutine, 信道c被锁
+}
+</code></pre>
+
+<p>执行这个程序你会看到Go报这样的错误:<br/>
+<code>fatal error: all goroutines are asleep - deadlock!</code><br/>
+何谓死锁? 操作系统有讲过的,所有的线程或进程都在等待资源的释放。如上的程序中, 只有一个goroutine, 所以当你向里面加数据或者存数据的话,都会锁死信道, 并且阻塞当前 goroutine, 也就是所有的goroutine(其实就main线一个)都在等待信道的开放(没人拿走数据信道是不会开放的),也就是死锁咯。</p>
+
+<p>我发现死锁是一个很有意思的话题,这里有几个死锁的例子:</p>
+
+<ol>
+<li>只在单一的goroutine里操作无缓冲信道,一定死锁。比如你只在main函数里操作信道:<br/></li>
+</ol>
+
+<pre><code>func main() {
+    ch := make(chan int)
+    ch &lt;- 1 // 1流入信道,堵塞当前线, 没人取走数据信道不会打开
+    fmt.Println(&quot;This line code wont run&quot;) //在此行执行之前Go就会报死锁
+}
+</code></pre>
+
+<ol>
+<li>如下也是一个死锁的例子:</li>
+</ol>
+
+<pre><code>var ch1 chan int = make(chan int)
+var ch2 chan int = make(chan int)
+
+func say(s string) {
+    fmt.Println(s)
+    ch1 &lt;- &lt;- ch2 // ch1 等待 ch2流出的数据
+}
+
+func main() {
+    go say(&quot;hello&quot;)
+    &lt;- ch1  // 堵塞主线
+}
+</code></pre>
+
+<p>其中主线等ch1中的数据流出,ch1等ch2的数据流出,但是ch2等待数据流入,两个goroutine都在等,也就是死锁。</p>
+
+<ol>
+<li>其实,总结来看,为什么会死锁？非缓冲信道上如果发生了流入无流出,或者流出无流入,也就导致了死锁。或者这样理解 Go启动的所有goroutine里的非缓冲信道一定要一个线里存数据,一个线里取数据,要成对才行 。所以下面的示例一定死锁:</li>
+</ol>
+
+<pre><code>c, quit := make(chan int), make(chan int)
+go func() {
+   c &lt;- 1  // c通道的数据没有被其他goroutine读取走,堵塞当前goroutine
+   quit &lt;- 0 // quit始终没有办法写入数据
+}()
+
+&lt;- quit // quit 等待数据的写
+</code></pre>
+
+<p>仔细分析的话,是由于：主线等待quit信道的数据流出,quit等待数据写入,而func被c通道堵塞,所有goroutine都在等,所以死锁。</p>
+
+<p>简单来看的话,一共两个线,func线中流入c通道的数据并没有在main线中流出,肯定死锁。</p>
+
+<p>但是,是否果真 所有不成对向信道存取数据的情况都是死锁?</p>
+
+<p>如下是个反例:  </p>
+
+<pre><code>func main() {
+    c := make(chan int)
+
+    go func() {
+       c &lt;- 1
+    }()
+}
+</code></pre>
+
+<p>程序正常退出了,很简单,并不是我们那个总结不起作用了,还是因为一个让人很囧的原因,main又没等待其它goroutine,自己先跑完了,所以没有数据流入c信道,一共执行了一个goroutine,并且没有发生阻塞,所以没有死锁错误。</p>
+
+<p>那么死锁的解决办法呢？</p>
+
+<p>最简单的,把没取走的数据取走,没放入的数据放入, 因为无缓冲信道不能承载数据,那么就赶紧拿走！</p>
+
+<p>具体来讲,就死锁例子3中的情况,可以这么避免死锁:  </p>
+
+<pre><code>c, quit := make(chan int), make(chan int)
+
+go func() {
+    c &lt;- 1
+    quit &lt;- 0
+}()
+
+&lt;- c // 取走c的数据！
+&lt;-quit
+</code></pre>
+
+<p>另一个解决办法是缓冲信道, 即设置c有一个数据的缓冲大小:  </p>
+
+<pre><code>c := make(chan int, 1)
+</code></pre>
+
+<p>这样的话,c可以缓存一个数据。也就是说,放入一个数据,c并不会挂起当前线, 再放一个才会挂起当前线直到第一个数据被其他goroutine取走, 也就是只阻塞在容量一定的时候,不达容量不阻塞。<br/>
+这十分类似我们Python中的队列Queue不是吗？</p>
+
+<h3 id="toc_3">无缓冲信道的数据进出顺序</h3>
+
+<p>我们已经知道,无缓冲信道从不存储数据,流入的数据必须要流出才可以。</p>
+
+<p>观察以下的程序:  </p>
+
+<pre><code>var ch chan int = make(chan int)
+
+func foo(id int) { //id: 这个routine的标号
+    ch &lt;- id
+}
+
+func main() {
+    // 开启5个routine
+    for i := 0; i &lt; 5; i++ {
+        go foo(i)
+    }
+
+    // 取出信道中的数据
+    for i := 0; i &lt; 5; i++ {
+        fmt.Print(&lt;- ch)
+    }
+}
+</code></pre>
+
+<p>我们开了5个goroutine,然后又依次取数据。其实整个的执行过程细分的话,5个线的数据 依次流过信道ch, main打印之, 而宏观上我们看到的即 无缓冲信道的数据是先到先出,但是 无缓冲信道并不存储数据,只负责数据的流通</p>
+
+<h3 id="toc_4">缓冲信道</h3>
+
+<p>终于到了这个话题了, 其实缓存信道用英文来讲更为达意: buffered channel.</p>
+
+<p>缓冲这个词意思是,缓冲信道不仅可以流通数据,还可以缓存数据。它是有容量的,存入一个数据的话 , 可以先放在信道里,不必阻塞当前线而等待该数据取走。</p>
+
+<p>当缓冲信道达到满的状态的时候,就会表现出阻塞了,因为这时再也不能承载更多的数据了,「你们必须把 数据拿走,才可以流入数据」。</p>
+
+<p>在声明一个信道的时候,我们给<code>make</code>以第二个参数来指明它的容量(默认为0,即无缓冲):  </p>
+
+<pre><code>var ch chan int = make(chan int, 2) // 写入2个元素都不会阻塞
+</code></pre>
+
+<p>当前goroutine, 存储个数达到2的时候会阻塞<br/>
+如下的例子,缓冲信道ch可以无缓冲的流入3个元素:  </p>
+
+<pre><code>func main() {
+    ch := make(chan int, 3)
+    ch &lt;- 1
+    ch &lt;- 2
+    ch &lt;- 3
+}
+</code></pre>
+
+<p>如果你再试图流入一个数据的话,信道ch会阻塞main线, 报死锁。</p>
+
+<p>也就是说,缓冲信道会在满容量的时候加锁。</p>
+
+<p>其实,缓冲信道是先进先出的,我们可以把缓冲信道看作为一个线程安全的队列： </p>
+
+<pre><code>func main() {
+    ch := make(chan int, 3)
+    ch &lt;- 1
+    ch &lt;- 2
+    ch &lt;- 3
+
+    fmt.Println(&lt;-ch) // 1
+    fmt.Println(&lt;-ch) // 2
+    fmt.Println(&lt;-ch) // 3
+}
+</code></pre>
+
+<h3 id="toc_5">信道数据读取和信道关闭</h3>
+
+<p>你也许发现,上面的代码一个一个地去读取信道简直太费事了,Go语言允许我们使用range来读取信道:  </p>
+
+<pre><code>func main() {
+    ch := make(chan int, 3)
+    ch &lt;- 1
+    ch &lt;- 2
+    ch &lt;- 3
+
+    for v := range ch {
+        fmt.Println(v)
+    }
+}
+</code></pre>
+
+<p>如果你执行了上面的代码,会报死锁错误的,原因是range不等到信道关闭是不会结束读取的。也就是如果 缓冲信道干涸了,那么range就会阻塞当前goroutine, 所以死锁咯。</p>
+
+<p>那么,我们试着避免这种情况,比较容易想到的是读到信道为空的时候就结束读取:  </p>
+
+<pre><code>ch := make(chan int, 3)
+ch &lt;- 1
+ch &lt;- 2
+ch &lt;- 3
+for v := range ch {
+    fmt.Println(v)
+    if len(ch) &lt;= 0 { // 如果现有数据量为0,跳出循环
+        break
+    }
+}
+</code></pre>
+
+<p>以上的方法是可以正常输出的,但是注意检查信道大小的方法不能在信道存取都在发生的时候用于取出所有数据,这个例子 是因为我们只在ch中存了数据,现在一个一个往外取,信道大小是递减的。</p>
+
+<p>另一个方式是显式地关闭信道:  </p>
+
+<pre><code>ch := make(chan int, 3)
+ch &lt;- 1
+ch &lt;- 2
+ch &lt;- 3
+
+// 显式地关闭信道
+close(ch)
+
+for v := range ch {
+    fmt.Println(v)
+}
+</code></pre>
+
+<p>被关闭的信道会禁止数据流入, 是只读的。我们仍然可以从关闭的信道中取出数据,但是不能再写入数据了。</p>
+
+<h3 id="toc_6">等待多gorountine的方案</h3>
+
+<p>那好,我们回到最初的一个问题,使用信道堵塞主线,等待开出去的所有goroutine跑完。</p>
+
+<p>这是一个模型,开出很多小goroutine, 它们各自跑各自的,最后跑完了向主线报告。</p>
+
+<p>我们讨论如下2个版本的方案:</p>
+
+<ol>
+<li>只使用单个无缓冲信道阻塞主线</li>
+<li>使用容量为goroutines数量的缓冲信道</li>
+</ol>
+
+<p>对于方案1, 示例的代码大概会是这个样子:  </p>
+
+<pre><code>var quit chan int // 只开一个信道
+
+func foo(id int) {
+    fmt.Println(id)
+    quit &lt;- 0 // ok, finished
+}
+
+func main() {
+    count := 1000
+    quit = make(chan int) // 无缓冲
+
+    for i := 0; i &lt; count; i++ {
+        go foo(i)
+    }
+
+    for i := 0; i &lt; count; i++ {
+        &lt;- quit
+    }
+}
+</code></pre>
+
+<p>对于方案2, 把信道换成缓冲1000的:  </p>
+
+<pre><code>quit = make(chan int, count) // 容量1000
+</code></pre>
+
+<p>其实区别仅仅在于一个是缓冲的，一个是非缓冲的。</p>
+
+<p>对于这个场景而言，两者都能完成任务, 都是可以的。</p>
+
+<ul>
+<li><p>无缓冲的信道是一批数据一个一个的「流进流出」</p></li>
+<li><p>缓冲信道则是一个一个存储，然后一起流出去</p></li>
+</ul>
+
+<h3 id="toc_7">Go语言的并发和并行</h3>
+
+<p>不知道你有没有注意到一个现象，还是这段代码，如果我跑在两个goroutines里面的话:    </p>
+
+<pre><code>var quit chan int = make(chan int)
+
+func loop() {
+    for i := 0; i &lt; 10; i++ {
+        fmt.Printf(&quot;%d &quot;, i)
+    }
+    quit &lt;- 0
+}
+
+
+func main() {
+    // 开两个goroutine跑函数loop, loop函数负责打印10个数
+    go loop()
+    go loop()
+
+    for i := 0; i &lt; 2; i++ {
+        &lt;- quit
+    }
+}
+</code></pre>
+
+<p>我们观察下输出:  </p>
+
+<p><code>0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9</code><br/>
+这是不是有什么问题？?</p>
+
+<p>以前我们用线程去做类似任务的时候，系统的线程会抢占式地输出， 表现出来的是乱序地输出。而goroutine为什么是这样输出的呢？</p>
+
+<h3 id="toc_8">goroutine是在并行吗？</h3>
+
+<p>我们找个例子测试下:  </p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+import &quot;time&quot;
+
+var quit chan int
+
+func foo(id int) {
+    fmt.Println(id)
+    time.Sleep(time.Second) // 停顿一秒
+    quit &lt;- 0 // 发消息：我执行完啦！
+}
+
+
+func main() {
+    count := 1000
+    quit = make(chan int, count) // 缓冲1000个数据
+
+    for i := 0; i &lt; count; i++ { //开1000个goroutine
+        go foo(i)
+    }
+
+    for i :=0 ; i &lt; count; i++ { // 等待所有完成消息发送完毕。
+        &lt;- quit
+    }
+}
+</code></pre>
+
+<p>让我们跑一下这个程序(之所以先编译再运行，是为了让程序跑的尽量快,测试结果更好):  </p>
+
+<pre><code>go build test.go
+time ./test
+./test  0.01s user 0.01s system 1% cpu 1.016 total
+</code></pre>
+
+<p>我们看到，总计用时接近一秒。 貌似并行了！</p>
+
+<p>我们需要首先考虑下什么是并发, 什么是并行</p>
+
+<h3 id="toc_9">并行和并发</h3>
+
+<p>从概念上讲，并发和并行是不同的  </p>
+
+<ul>
+<li>两个队列，一个Coffee机器，那是并发</li>
+<li>两个队列，两个Coffee机器，那是并行
+更多的资料： 并发不是并行, 当然Google上有更多关于并行和并发的区别。</li>
+</ul>
+
+<p>那么回到一开始的疑问上，从上面的两个例子执行后的表现来看，多个goroutine跑loop函数会挨个goroutine去进行，而sleep则是一起执行的。</p>
+
+<p>这是为什么？</p>
+
+<p>默认地， <code>Go</code>所有的goroutines只能在一个线程里跑 。</p>
+
+<p>也就是说， 以上两个代码都不是并行的，但是都是是并发的。</p>
+
+<p>如果当前goroutine不发生阻塞，它是不会让出CPU给其他goroutine的, 所以例子一中的输出会是一个一个goroutine进行的，而sleep函数则阻塞掉了 当前goroutine, 当前goroutine主动让其他goroutine执行, 所以形成了逻辑上的并行, 也就是并发。</p>
+
+<h3 id="toc_10">真正的并行</h3>
+
+<p>为了达到真正的并行，我们需要告诉Go我们允许同时最多使用多个核。</p>
+
+<p>回到起初的例子，我们设置最大开2个原生线程, 我们需要用到runtime包(runtime包是goroutine的调度器):  </p>
+
+<pre><code>import (
+    &quot;fmt&quot;
+    &quot;runtime&quot;
+)
+
+var quit chan int = make(chan int)
+
+func loop() {
+    for i := 0; i &lt; 100; i++ { //为了观察，跑多些
+        fmt.Printf(&quot;%d &quot;, i)
+    }
+    quit &lt;- 0
+}
+
+func main() {
+    runtime.GOMAXPROCS(2) // 最多使用2个核
+
+    go loop()
+    go loop()
+
+    for i := 0; i &lt; 2; i++ {
+        &lt;- quit
+    }
+}
+</code></pre>
+
+<p>这下会看到两个goroutine会抢占式地输出数据了。</p>
+
+<p>我们还可以这样显式地让出CPU时间： </p>
+
+<pre><code>func loop() {
+    for i := 0; i &lt; 10; i++ {
+        runtime.Gosched() // 显式地让出CPU时间给其他goroutine
+        fmt.Printf(&quot;%d &quot;, i)
+    }
+    quit &lt;- 0
+}
+
+
+func main() {
+
+    go loop()
+    go loop()
+
+    for i := 0; i &lt; 2; i++ {
+        &lt;- quit
+    }
+}
+</code></pre>
+
+<p>观察下结果会看到这样有规律的输出:</p>
+
+<p><code>0 0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9</code><br/>
+其实，这种主动让出CPU时间的方式仍然是在单核里跑。但手工地切换goroutine导致了看上去的“并行”。</p>
+
+<p>其实作为一个Python程序员，goroutine让我更多地想到的是gevent的协程，而不是原生线程。</p>
+
+<p>关于runtime包对goroutine的调度，在stackoverflow上有一个不错的答案:<a href="http://stackoverflow.com/questions/13107958/what-exactly-does-runtime-gosched-do">http://stackoverflow.com/questions/13107958/what-exactly-does-runtime-gosched-do</a></p>
+
+<h3 id="toc_11">一个小问题</h3>
+
+<p>我在Segmentfault看到了这个问题: <a href="http://segmentfault.com/q/1010000000207474">http://segmentfault.com/q/1010000000207474</a></p>
+
+<p>题目说，如下的程序，按照理解应该打印下5次 &quot;world&quot;呀，可是为什么什么也没有打印  </p>
+
+<pre><code>package main
+
+import (
+    &quot;fmt&quot;
+)
+
+func say(s string) {
+    for i := 0; i &lt; 5; i++ {
+        fmt.Println(s)
+    }
+}
+
+func main() {
+    go say(&quot;world&quot;) //开一个新的Goroutines执行
+    for {
+    }
+}
+</code></pre>
+
+<p>楼下的答案已经很棒了，这里Go仍然在使用单核，for死循环占据了单核CPU所有的资源，而main线和say两个goroutine都在一个线程里面， 所以say没有机会执行。解决方案还是两个：</p>
+
+<ul>
+<li>允许Go使用多核(runtime.GOMAXPROCS)</li>
+<li>手动显式调动(runtime.Gosched)</li>
+</ul>
+
+<h3 id="toc_12">runtime调度器</h3>
+
+<p>runtime调度器是个很神奇的东西，但是我真是但愿它不存在，我希望显式调度能更为自然些，多核处理默认开启。</p>
+
+<p>关于runtime包几个函数:</p>
+
+<ul>
+<li><p>Gosched 让出cpu</p></li>
+<li><p>NumCPU 返回当前系统的CPU核数量</p></li>
+<li><p>GOMAXPROCS 设置最大的可同时使用的CPU核数</p></li>
+<li><p>Goexit 退出当前goroutine(但是defer语句会照常执行)</p></li>
+</ul>
+
+<h3 id="toc_13">总结</h3>
+
+<p>我们从例子中可以看到，默认的, 所有goroutine会在一个原生线程里跑，也就是只使用了一个CPU核。</p>
+
+<p>在同一个原生线程里，如果当前goroutine不发生阻塞，它是不会让出CPU时间给其他同线程的goroutines的，这是Go运行时对goroutine的调度，我们也可以使用runtime包来手工调度。</p>
+
+<p>本文开头的两个例子都是限制在单核CPU里执行的，所有的goroutines跑在一个线程里面，分析如下:</p>
+
+<p>对于代码例子一（loop函数的那个），每个goroutine没有发生堵塞(直到quit流入数据), 所以在quit之前每个goroutine不会主动让出CPU，也就发生了串行打印<br/>
+对于代码例子二（time的那个），每个goroutine在sleep被调用的时候会阻塞，让出CPU, 所以例子二并发执行。<br/>
+那么关于我们开启多核的时候呢？Go语言对goroutine的调度行为又是怎么样的？</p>
+
+<p>我们可以在Golang官方网站的这里 找到一句话:</p>
+
+<blockquote>
+<p>When a coroutine blocks, such as by calling a blocking system call, the run-time automatically moves other coroutines on the same operating system thread to a different, runnable thread so they won&#39;t be blocked.<br/>
+也就是说:</p>
+</blockquote>
+
+<p>当一个goroutine发生阻塞，Go会自动地把与该goroutine处于同一系统线程的其他goroutines转移到另一个系统线程上去，以使这些goroutines不阻塞</p>
+
+<h3 id="toc_14">开启多核的实验</h3>
+
+<p>仍然需要做一个实验，来测试下多核支持下goroutines的对原生线程的分配, 也验证下我们所得到的结论“goroutine不阻塞不放开CPU”。</p>
+
+<p>实验代码如下:  </p>
+
+<pre><code>package main
+
+import (
+    &quot;fmt&quot;
+    &quot;runtime&quot;
+)
+
+var quit chan int = make(chan int)
+
+func loop(id int) { // id: 该goroutine的标号
+    for i := 0; i &lt; 10; i++ { //打印10次该goroutine的标号
+        fmt.Printf(&quot;%d &quot;, id)
+    }
+    quit &lt;- 0
+}
+
+func main() {
+    runtime.GOMAXPROCS(2) // 最多同时使用2个核
+
+    for i := 0; i &lt; 3; i++ { //开三个goroutine
+        go loop(i)
+    }
+
+    for i := 0; i &lt; 3; i++ {
+        &lt;- quit
+    }
+}
+</code></pre>
+
+<p>多跑几次会看到类似这些输出(不同机器环境不一样):  </p>
+
+<pre><code>0 0 0 0 0 1 1 0 0 1 0 0 1 0 1 2 1 2 1 2 1 2 1 2 1 2 2 2 2 2
+0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2
+0 0 0 0 0 0 0 1 1 1 1 1 0 1 0 1 0 1 2 1 2 1 2 2 2 2 2 2 2 2
+0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 0 2 0 2 0 2 2 2 2 2 2 2 2
+0 0 0 0 0 0 0 1 0 0 1 0 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 2 2
+</code></pre>
+
+<p>执行它我们会发现以下现象:</p>
+
+<ul>
+<li>有时会发生抢占式输出(说明Go开了不止一个原生线程，达到了真正的并行)</li>
+<li>有时会顺序输出, 打印完0再打印1, 再打印2(说明Go开一个原生线程，单线程上的goroutine不阻塞不松开CPU)</li>
+</ul>
+
+<p>那么，我们还会观察到一个现象，无论是抢占地输出还是顺序的输出，都会有那么两个数字表现出这样的现象:</p>
+
+<ul>
+<li>一个数字的所有输出都会在另一个数字的所有输出之前</li>
+</ul>
+
+<p>原因是， 3个goroutine分配到至多2个线程上，就会至少两个goroutine分配到同一个线程里，单线程里的goroutine 不阻塞不放开CPU, 也就发生了顺序输出。</p>
+
+<h3 id="toc_15">生成器</h3>
+
+<p>在Python中我们可以使用yield关键字来让一个函数成为生成器，在Go中我们可以使用信道来制造生成器(一种lazy load类似的东西)。</p>
+
+<p>当然我们的信道并不是简单的做阻塞主线的功能来使用的哦。</p>
+
+<p>下面是一个制作自增整数生成器的例子，直到主线向信道索要数据，我们才添加数据到信道  </p>
+
+<pre><code>func xrange() chan int{ // xrange用来生成自增的整数
+    var ch chan int = make(chan int)
+
+    go func() { // 开出一个goroutine
+        for i := 0; ; i++ {
+            ch &lt;- i  // 直到信道索要数据，才把i添加进信道
+        }
+    }()
+
+    return ch
+}
+
+func main() {
+
+    generator := xrange()
+
+    for i:=0; i &lt; 1000; i++ {  // 我们生成1000个自增的整数！
+        fmt.Println(&lt;-generator)
+    }
+}
+</code></pre>
+
+<p>这不禁叫我想起了Python中可爱的xrange, 所以给了生成器这个名字！</p>
+
+<h3 id="toc_16">服务化</h3>
+
+<p>比如我们加载一个网站的时候，例如我们登入新浪微博，我们的消息数据应该来自一个独立的服务，这个服务只负责 返回某个用户的新的消息提醒。</p>
+
+<p>如下是一个使用示例:  </p>
+
+<pre><code>func get_notification(user string) chan string{
+   /*
+    * 此处可以查询数据库获取新消息等等..
+    */
+    notifications := make(chan string)
+
+    go func() { // 悬挂一个信道出去
+        notifications &lt;- fmt.Sprintf(&quot;Hi %s, welcome to weibo.com!&quot;, user)
+    }()
+
+    return notifications
+}
+
+func main() {
+    jack := get_notification(&quot;jack&quot;) //  获取jack的消息
+    joe := get_notification(&quot;joe&quot;) // 获取joe的消息
+
+    // 获取消息的返回
+    fmt.Println(&lt;-jack)
+    fmt.Println(&lt;-joe)
+}
+</code></pre>
+
+<h3 id="toc_17">多路复合</h3>
+
+<p>上面的例子都使用一个信道作为返回值，可以把信道的数据合并到一个信道的。 不过这样的话，我们需要按顺序输出我们的返回值（先进先出）。</p>
+
+<p>如下，我们假设要计算很复杂的一个运算 100-x , 分为三路计算， 最后统一在一个信道中取出结果:  </p>
+
+<pre><code>func do_stuff(x int) int { // 一个比较耗时的事情，比如计算
+    time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond) //模拟计算
+    return 100 - x // 假如100-x是一个很费时的计算
+}
+
+func branch(x int) chan int{ // 每个分支开出一个goroutine做计算并把计算结果流入各自信道
+    ch := make(chan int)
+    go func() {
+        ch &lt;- do_stuff(x)
+    }()
+    return ch
+}
+
+func fanIn(chs... chan int) chan int {
+    ch := make(chan int)
+
+    for _, c := range chs {
+        // 注意此处明确传值
+        go func(c chan int) {ch &lt;- &lt;- c}(c) // 复合
+    }
+
+    return ch
+}
+
+
+func main() {
+    result := fanIn(branch(1), branch(2), branch(3))
+
+    for i := 0; i &lt; 3; i++ {
+        fmt.Println(&lt;-result)
+    }
+}
+</code></pre>
+
+<h3 id="toc_18">select监听信道</h3>
+
+<p>Go有一个语句叫做select，用于监测各个信道的数据流动。</p>
+
+<p>如下的程序是select的一个使用例子，我们监视三个信道的数据流出并收集数据到一个信道中。  </p>
+
+<pre><code>func foo(i int) chan int {
+    c := make(chan int)
+    go func () { c &lt;- i }()
+    return c
+}
+
+
+func main() {
+    c1, c2, c3 := foo(1), foo(2), foo(3)
+
+    c := make(chan int)
+
+    go func() { // 开一个goroutine监视各个信道数据输出并收集数据到信道c
+        for {
+            select { // 监视c1, c2, c3的流出，并全部流入信道c
+            case v1 := &lt;- c1: c &lt;- v1
+            case v2 := &lt;- c2: c &lt;- v2
+            case v3 := &lt;- c3: c &lt;- v3
+            }
+        }
+    }()
+
+    // 阻塞主线，取出信道c的数据
+    for i := 0; i &lt; 3; i++ {
+        fmt.Println(&lt;-c) // 从打印来看我们的数据输出并不是严格的1,2,3顺序
+    }
+}
+</code></pre>
+
+<p>有了select, 我们在 多路复合中的示例代码中的函数fanIn还可以这么来写(这样就不用开好几个goroutine来取数据了):  </p>
+
+<pre><code>func fanIn(branches ... chan int) chan int {
+    c := make(chan int)
+
+    go func() {
+        for i := 0 ; i &lt; len(branches); i++ { //select会尝试着依次取出各个信道的数据
+            select {
+            case v1 := &lt;- branches[i]: c &lt;- v1
+            }
+        }
+    }()
+
+    return c
+}
+</code></pre>
+
+<p>使用select的时候，有时需要超时处理, 其中的timeout信道相当有趣:  </p>
+
+<pre><code>timeout := time.After(1 * time.Second) // timeout 是一个计时信道, 如果达到时间了，就会发一个信号出来
+
+for is_timeout := false; !is_timeout; {
+    select { // 监视信道c1, c2, c3, timeout信道的数据流出
+    case v1 := &lt;- c1: fmt.Printf(&quot;received %d from c1&quot;, v1)
+    case v2 := &lt;- c2: fmt.Printf(&quot;received %d from c2&quot;, v2)
+    case v3 := &lt;- c3: fmt.Printf(&quot;received %d from c3&quot;, v3)
+    case &lt;- timeout: is_timeout = true // 超时
+    }
+}
+</code></pre>
+
+<h3 id="toc_19">结束标志</h3>
+
+<p>在Go并发与并行笔记一我们已经讲过信道的一个很重要也很平常的应用，就是使用无缓冲信道来阻塞主线，等待goroutine结束。</p>
+
+<p>这样我们不必再使用timeout。</p>
+
+<p>那么对上面的timeout来结束主线的方案作个更新：  </p>
+
+<pre><code>func main() {
+
+    c, quit := make(chan int), make(chan int)
+
+    go func() {
+        c &lt;- 2  // 添加数据
+        quit &lt;- 1 // 发送完成信号
+    } ()
+
+    for is_quit := false; !is_quit; {
+        select { // 监视信道c的数据流出
+        case v := &lt;-c: fmt.Printf(&quot;received %d from c&quot;, v)
+        case &lt;-quit: is_quit = true // quit信道有输出，关闭for循环
+        }
+    }
+}
+</code></pre>
+
+<h3 id="toc_20">菊花链</h3>
+
+<p>简单地来说，数据从一端流入，从另一端流出，看上去好像一个链表，不知道为什么要取这么个尴尬的名字。。</p>
+
+<p>菊花链的英文名字叫做: Daisy-chain, 它的一个应用就是做过滤器，比如我们来筛下100以内的素数(你需要先知道什么是筛法)</p>
+
+<p>程序有详细的注释，不再说明了。  </p>
+
+<pre><code>/*
+ *  利用信道菊花链筛法求某一个整数范围的素数
+ *  筛法求素数的基本思想是：把从1开始的、某一范围内的正整数从小到大顺序排列，
+ *  1不是素数，首先把它筛掉。剩下的数中选择最小的数是素数，然后去掉它的倍数。
+ *  依次类推，直到筛子为空时结束
+ */
+package main
+
+import &quot;fmt&quot;
+
+func xrange() chan int{ // 从2开始自增的整数生成器
+    var ch chan int = make(chan int)
+
+    go func() { // 开出一个goroutine
+        for i := 2; ; i++ {
+            ch &lt;- i  // 直到信道索要数据，才把i添加进信道
+        }
+    }()
+
+    return ch
+}
+
+
+func filter(in chan int, number int) chan int {
+    // 输入一个整数队列，筛出是number倍数的, 不是number的倍数的放入输出队列
+    // in:  输入队列
+    out := make(chan int)
+
+    go func() {
+        for {
+            i := &lt;- in // 从输入中取一个
+
+            if i % number != 0 {
+                out &lt;- i // 放入输出信道
+            }
+        }
+    }()
+
+    return out
+}
+
+
+func main() {
+    const max = 100 // 找出100以内的所有素数
+    nums := xrange() // 初始化一个整数生成器
+    number := &lt;-nums  // 从生成器中抓一个整数(2), 作为初始化整数
+
+    for number &lt;= max { // number作为筛子，当筛子超过max的时候结束筛选
+        fmt.Println(number) // 打印素数, 筛子即一个素数
+        nums = filter(nums, number) //筛掉number的倍数
+        number = &lt;- nums  // 更新筛子
+    }
+}
+</code></pre>
+
+<h2 id="toc_21">3 随机数生成器</h2>
+
+<p>信道可以做生成器使用，作为一个特殊的例子，它还可以用作随机数生成器。如下是一个随机01生成器:  </p>
+
+<pre><code>func rand01() chan int {
+    ch := make(chan int)
+
+    go func () {
+        for {
+            select { //select会尝试执行各个case, 如果都可以执行，那么随机选一个执行
+            case ch &lt;- 0:
+            case ch &lt;- 1:
+            }
+        }
+    }()
+
+    return ch
+}
+
+
+func main() {
+    generator := rand01() //初始化一个01随机生成器
+
+    //测试，打印10个随机01
+    for i := 0; i &lt; 10; i++ {
+        fmt.Println(&lt;-generator)
+    }
+}
+</code></pre>
+
+<h3 id="toc_22">定时器</h3>
+
+<p>我们刚才其实已经接触了信道作为定时器, time包里的After会制作一个定时器。</p>
+
+<p>看看我们的定时器吧！  </p>
+
+<pre><code>/*
+ * 利用信道做定时器
+ */
+
+package main
+
+import (
+    &quot;fmt&quot;
+    &quot;time&quot;
+)
+
+
+func timer(duration time.Duration) chan bool {
+    ch := make(chan bool)
+
+    go func() {
+        time.Sleep(duration)
+        ch &lt;- true // 到时间啦！
+    }()
+
+    return ch
+}
+
+func main() {
+    timeout := timer(time.Second) // 定时1s
+
+    for {
+        select {
+        case &lt;- timeout:
+            fmt.Println(&quot;already 1s!&quot;) // 到时间
+            return  //结束程序
+        }
+    }
+}
+</code></pre>
+<br /><br /><br /><br /><br />
+</div><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+</body>
+
+</html>
