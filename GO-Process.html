@@ -838,1023 +838,664 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </style>
 
 <style> @media print{ .hljs{overflow: visible; word-wrap: break-word !important;} }</style></head><body><div class="markdown-body yue">
-<h3 id="toc_0">goroutine</h3>
+<h1 id="toc_0">进程管理</h1>
 
-<p>Go语言中有个概念叫做goroutine, 这类似我们熟知的线程,但是更轻。<br/><br/>
-以下的程序,我们串行地去执行两次<code>loop</code>函数:  </p>
-
-<pre><code>func loop() {
-    for i := 0; i &lt; 10; i++ {
-        fmt.Printf(&quot;%d &quot;, i)
-    }
-}
-
-func main() {
-    loop()
-    loop()
-}
-</code></pre>
-
-<p>毫无疑问,输出会是这样的:  </p>
-
-<pre><code>0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
-</code></pre>
-
-<p>下面我们把一个loop放在一个goroutine里跑,我们可以使用关键字go来定义并启动一个goroutine:   </p>
-
-<pre><code>func main() {
-    go loop() // 启动一个goroutine
-    loop()
-}
-</code></pre>
-
-<p>这次的输出变成了:  </p>
-
-<pre><code>0 1 2 3 4 5 6 7 8 9
-</code></pre>
-
-<p>可是为什么只输出了一趟呢？明明我们主线跑了一趟,也开了一个goroutine来跑一趟啊。  </p>
-
-<p>原来,在goroutine还没来得及跑loop的时候,主函数已经退出了。  </p>
-
-<p>main函数退出地太快了,我们要想办法阻止它过早地退出,一个办法是让main等待一下:  </p>
-
-<pre><code>func main() {
-    go loop()
-    loop()
-    time.Sleep(time.Second) // 停顿一秒
-}
-</code></pre>
-
-<p>这次确实输出了两趟,目的达到了。</p>
-
-<p>可是采用等待的办法并不好,如果goroutine在结束的时候,告诉下主线说“Hey, 我要跑完了！”就好了, 即所谓阻塞主线的办法,回忆下我们Python里面等待所有线程执行完毕的写法:  </p>
-
-<pre><code>for thread in threads:
-    thread.join()
-</code></pre>
-
-<p>是的,我们也需要一个类似<code>join</code>的东西来阻塞住主线。那就是信道</p>
-
-<h3 id="toc_1">信道</h3>
-
-<p>信道是什么？简单说,是goroutine之间互相通讯的东西。类似我们Unix上的管道（可以在进程间传递消息）,用来goroutine之间发消息和接收消息。其实,就是在做goroutine之间的内存共享。</p>
-
-<p>使用<code>make</code>来建立一个信道:<br/>
-<code><br/>
-var channel chan int = make(chan int)<br/>
-// 或<br/>
-channel := make(chan int)<br/>
-</code><br/>
-那如何向信道存消息和取消息呢？ 一个例子:  </p>
-
-<pre><code>func main() {
-    var messages chan string = make(chan string)
-    go func(message string) {
-        messages &lt;- message // 存消息
-    }(&quot;Ping!&quot;)
-
-    fmt.Println(&lt;-messages) // 取消息
-}
-</code></pre>
-
-<p>默认的,信道的存消息和取消息都是阻塞的 (叫做无缓冲的信道,不过缓冲这个概念稍后了解,先说阻塞的问题)。</p>
-
-<p>也就是说, 无缓冲的信道在取消息和存消息的时候都会挂起当前的goroutine,除非另一端已经准备好。</p>
-
-<p>比如以下的main函数和foo函数:  </p>
-
-<pre><code>var ch chan int = make(chan int)
-
-func foo() {
-    ch &lt;- 0  // 向ch中加数据,如果没有其他goroutine来取走这个数据,那么挂起foo, 直到main函数把0这个数据拿走
-}
-
-func main() {
-    go foo()
-    &lt;- ch // 从ch取数据,如果ch中还没放数据,那就挂起main线,直到foo函数中放数据为止
-}
-</code></pre>
-
-<p>那既然信道可以阻塞当前的goroutine, 那么回到上一部分「goroutine」所遇到的问题「如何让goroutine告诉主线我执行完毕了」 的问题来, 使用一个信道来告诉主线即可:  </p>
-
-<pre><code>var complete chan int = make(chan int)
-
-func loop() {
-    for i := 0; i &lt; 10; i++ {
-        fmt.Printf(&quot;%d &quot;, i)
-    }
-
-    complete &lt;- 0 // 执行完毕了,发个消息
-}
-
-
-func main() {
-    go loop()
-    &lt;- complete // 直到线程跑完, 取到消息. main在此阻塞住
-}
-</code></pre>
-
-<p>如果不用信道来阻塞主线的话,主线就会过早跑完,loop线都没有机会执行</p>
-
-<p>其实,无缓冲的信道永远不会存储数据,只负责数据的流通,为什么这么讲呢？</p>
+<h2 id="toc_1">进程的引入</h2>
 
 <ul>
-<li><p>从无缓冲信道取数据,必须要有数据流进来才可以,否则当前线阻塞</p></li>
-<li><p>数据流入无缓冲信道, 如果没有其他goroutine来拿走这个数据,那么当前线阻塞</p></li>
+<li>进程的并发执行  <code>提高计算机系统的资源利用率及系统吞吐量</code></li>
+<li>进程并发执行的特征
+
+<ul>
+<li>间断性</li>
+<li>失去封闭性，程序运行结果不可再现性  <code>与时间有关的错误：没有实现互斥共享</code></li>
+<li>静态程序结构不能支持并发运行的实现</li>
+</ul></li>
+<li>进程管理功能
+
+<ul>
+<li>进程控制</li>
+<li>进程互斥与同步
+
+<ul>
+<li>互斥方式<code>多个进程在共享临界资源时应采用互斥方式访问</code></li>
+<li>同步方式<code>当多个进程互相合作完成一共同任务时，需要对它们的执行次序加以协调，满足它们的前驱后继关系</code></li>
+</ul></li>
+<li>进程通信 <code>进程之间进行信息交换</code></li>
+<li>调度</li>
+</ul></li>
 </ul>
 
-<p>所以,你可以测试下,无论如何,我们测试到的无缓冲信道的大小都是0 (len(channel))</p>
+<h2 id="toc_2">进程概念</h2>
 
-<p>如果信道正有数据在流动,我们还要加入数据,或者信道干涩,我们一直向无数据流入的空信道取数据<br/>
-呢？ 就会引起死锁</p>
+<ul>
+<li>进程定义与特征
 
-<h3 id="toc_2">死锁</h3>
+<ul>
+<li>进程定义和特征 <code>进程是具有一定独立功能的程序关于某个数据集合的一次运行过程，是系统进行资源分配和调度的一个独立单位</code>
 
-<p>一个死锁的例子:  </p>
+<ul>
+<li>动态性 <code>进程是程序的一次执行过程，它因创建而产生、由调度而执行、因得不到资源而暂停执行、最后因撤销而消亡</code></li>
+<li>并发性 <code>进程的并发性是指同在内存中的多个进程能在一段时间内同时运行，交替使用处理器</code></li>
+<li>独立性 <code>进程是一个能独立运行的基本单位，也是系统进行资源分配和调度的一个独立单位</code></li>
+<li>异步性 <code>各进程是按各自独立的、不可预知的速度向前推进的</code></li>
+</ul></li>
+<li>进程映像 <code>进程实体的组成</code></li>
+<li>进程与程序的区别和联系
 
-<pre><code>func main() {
-    ch := make(chan int)
-    &lt;- ch // 阻塞main goroutine, 信道c被锁
-}
-</code></pre>
+<ul>
+<li>程序是静态概念，本身可以作为软件资源长期保存;而进程是程序的一次执行过程，是动态的，有一定的生命期</li>
+<li>进程是一个能独立运行的单位，是系统进行资源分配和调度的基本单位，能与其它进程并发执行，而程序因其自身不能描述并发运行过程中的动态信息，所以无法参与并发运行</li>
+<li>各进程在并发执行过程中存在异步性特征，而程序因为只能顺序执行，故没有这个特征</li>
+<li>程序和进程并非是一一对应关系</li>
+</ul></li>
+</ul></li>
+<li>进程状态与转换
 
-<p>执行这个程序你会看到Go报这样的错误:<br/>
-<code>fatal error: all goroutines are asleep - deadlock!</code><br/>
-何谓死锁? 操作系统有讲过的,所有的线程或进程都在等待资源的释放。如上的程序中, 只有一个goroutine, 所以当你向里面加数据或者存数据的话,都会锁死信道, 并且阻塞当前 goroutine, 也就是所有的goroutine(其实就main线一个)都在等待信道的开放(没人拿走数据信道是不会开放的),也就是死锁咯。</p>
+<ul>
+<li>进程的三种基本状态
 
-<p>我发现死锁是一个很有意思的话题,这里有几个死锁的例子:</p>
+<ul>
+<li>就绪状态</li>
+<li>运行状态</li>
+<li>阻塞状态<br/>
+<code>
+就绪→进程调度→运行  
+运行→时间片到→就绪  
+运行→等待某事件发生→阻塞  
+阻塞→所等待事件发生→就绪  
+</code></li>
+<li>创建状态与终止状态</li>
+</ul></li>
+</ul></li>
+<li>linux进程状态解析</li>
+<li>进程控制块
+
+<ul>
+<li>进程标识信息
+
+<ul>
+<li>进程标识符</li>
+<li>用户标识符</li>
+<li>家族关系</li>
+</ul></li>
+<li>进程调度信息
+
+<ul>
+<li>进程状态</li>
+<li>进程优先级</li>
+<li>其他调度相关信息</li>
+<li>事件</li>
+</ul></li>
+<li>进程现场信息
+
+<ul>
+<li>通用寄存器内容</li>
+<li>指令计数器的值</li>
+<li>程序状态字PSW</li>
+<li>栈指针</li>
+</ul></li>
+<li>进程控制信息
+
+<ul>
+<li>进程的程序和数据在内存或外存的地址</li>
+</ul></li>
+<li>进程同步信息</li>
+<li>进程通信信息</li>
+<li>资源管理信息</li>
+<li>链接指针</li>
+</ul></li>
+</ul>
+
+<h2 id="toc_3">进程控制</h2>
+
+<ul>
+<li>进程创建
+
+<ul>
+<li>进程图</li>
+<li>引起进程创建的典型事件
+
+<ul>
+<li>作业调度</li>
+<li>用户登录</li>
+<li>提供特定服务</li>
+<li>应用请求</li>
+</ul></li>
+<li>进程创建原语
+
+<ul>
+<li>为新进程申请一个尚未被使用的pid和一个空白PCB</li>
+<li>为新进程分配必要的资源</li>
+<li>初始化新进程的PCB</li>
+<li>最后，将新进程状态置为就绪状态，并插入就绪队列，等待CPU调度</li>
+</ul></li>
+</ul></li>
+<li>进程撤销
+
+<ul>
+<li>引起进程撤销的典型事件
+
+<ul>
+<li>正常结束而撤销</li>
+<li>异常终止而撤销</li>
+<li>应外界干预而撤销
+
+<ul>
+<li>操作员或操作系统干预</li>
+<li>父进程请求</li>
+<li>父进程被撤销</li>
+</ul></li>
+</ul></li>
+<li>进程撤销原语
+
+<ul>
+<li>根据被撤销进程的标识符，从系统PCB集合中找到该进程的PCB，读出其状态，若处于运行状态，则立即终止其运行，并将系统调度标志置为&quot;True&quot;，以便撤销该进程后系统立即重新进行CPU调度</li>
+<li>若被撤销进程还有子进程，或者为这些子进程临时指定新的父进程</li>
+<li>回收被撤销进程所拥有的全部系统资源</li>
+<li>最后，将被撤销进程的PCB从所在队列移出，待以后父进程从中收集相关信息后，最后释放它，则改进程就永远从系统中消失了</li>
+</ul></li>
+</ul></li>
+<li>进程阻塞与唤醒
+
+<ul>
+<li>引起进程堵塞和唤醒的典型事件
+
+<ul>
+<li>请求资源失败</li>
+<li>等待某种操作的完成</li>
+<li>前驱进程尚未完成</li>
+<li>进程无新工作可做</li>
+</ul></li>
+<li>进程阻塞原语</li>
+<li>进程唤醒</li>
+</ul></li>
+<li>Linux进程管理
+
+<ul>
+<li>进程描述符task_struct
+
+<ul>
+<li>进程状态 <code>state exit_state</code></li>
+<li>相关标识符信息
+
+<ul>
+<li>pid_t pid</li>
+<li>pid_t tgid</li>
+<li>pid_t pgrp</li>
+<li>session</li>
+<li>uid和gid</li>
+<li>euid和egid</li>
+<li>suid和sgid</li>
+<li>fsuid和fsgid</li>
+</ul></li>
+<li>家族关系
+
+<ul>
+<li>struct task_struct *group_leader</li>
+<li>struct list_head thread_group</li>
+<li>struct task_struct *real_parent</li>
+<li>struct task_struct *parent</li>
+<li>struct list_head children</li>
+<li>struct list_head sibling</li>
+</ul></li>
+<li>进程调度相关信息</li>
+<li>进程地址空间及文件系统信息</li>
+<li>进程信号管理相关信息</li>
+</ul></li>
+<li>进程创建
+
+<ul>
+<li>fork()</li>
+<li>vfork()</li>
+<li>clone()</li>
+<li>do_fork()</li>
+</ul></li>
+<li>进程终止</li>
+<li>进程睡眠和唤醒
+
+<ul>
+<li>进程睡眠</li>
+<li>唤醒进程</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2 id="toc_4">进程同步</h2>
+
+<ul>
+<li>进程同步的基本概念
+
+<ul>
+<li>并发进程间的间接制约关系与进程互斥
+
+<ul>
+<li>临界资源</li>
+<li>临界区</li>
+<li>同步机制应遵循的原则
+
+<ul>
+<li>空闲让进</li>
+<li>忙则等待</li>
+<li>有限等待</li>
+<li>让权等待</li>
+</ul></li>
+</ul></li>
+<li>并发进程间的直接制约关系与进程同步</li>
+</ul></li>
+<li>进程同步机制及应用 <code>保证多个并发进程间的正确执行,使它们的执行结果具有可再现性</code>
+
+<ul>
+<li>利用硬件方法解决进程互斥问题
+
+<ul>
+<li>禁止中断 <code>使切换进程不可能发生</code></li>
+<li>利用专用机器指令解决进程互斥问题
+
+<ul>
+<li>TSL指令 <code>读出指令地址中的值,并为其赋予一非零新值,最后返回该地址中的旧值</code></li>
+<li>Swap指令 <code>全局布尔变量lock和局部布尔变量key</code></li>
+</ul></li>
+</ul></li>
+<li>利用软件方法解决进程互斥问题
+
+<ul>
+<li>Peterson算法
 
 <ol>
-<li>只在单一的goroutine里操作无缓冲信道,一定死锁。比如你只在main函数里操作信道:<br/></li>
-</ol>
+<li>设置两个共享变量：boolean数组flag[2]，表示进程是否希望进入临界区，初始值均为false。整型变量turn，用于标识当前优先允许哪个进程进入</li>
+<li>当P0希望进入临界区时，将其flag[0]置为true，同时置turn为1，将优先进入临界区的机会让给P1 然后判断：若P1的flag[1]为true且turn值为1，则等待P1退出临界区，否则直接进入。退出临界区时将flag[0]置为false</li>
+</ol></li>
+<li>面包店算法 <code>为每个进程设置一个唯一编号Pi，同时设置两个公用的数据结构：boolean choosing[N]表示进程是否正在取号，初始值为false，若Pi正在取号，改为True，int number[N]表示取到的号吗，初始值为0</code></li>
+</ul></li>
+<li>利用锁机制解决进程互斥问题 <code>为每个资源设置一把锁</code></li>
+<li>利用信号量机制解决进程互斥问题
 
-<pre><code>func main() {
-    ch := make(chan int)
-    ch &lt;- 1 // 1流入信道,堵塞当前线, 没人取走数据信道不会打开
-    fmt.Println(&quot;This line code wont run&quot;) //在此行执行之前Go就会报死锁
-}
-</code></pre>
+<ul>
+<li>整形信号量机制</li>
+<li>记录型信号量机制</li>
+<li>信号量集机制</li>
+<li>利用信号量机制实现进程的互斥</li>
+<li>利用信号量机制实现进程的同步</li>
+</ul></li>
+</ul></li>
+<li>经典进程同步问题
+
+<ul>
+<li>生产者-消费者问题</li>
+<li>哲学家进餐问题</li>
+<li>读者-写者问题</li>
+<li>理发师问题</li>
+</ul></li>
+<li>管程机制
+
+<ul>
+<li>管程定义 <code>一个管程定义了一个数据结构和能为并发进程所致行的一组操作</code></li>
+<li>定义变量</li>
+<li>利用管程机制解决生产者-消费者问题</li>
+</ul></li>
+<li>linux同步机制解析
+
+<ul>
+<li>原子操作</li>
+<li>自旋锁</li>
+<li>读写自旋锁</li>
+<li>内核信号量</li>
+<li>读写信号量</li>
+<li>IPC信号量 （System V信号量）</li>
+<li>Posix信号量</li>
+</ul></li>
+</ul>
+
+<h2 id="toc_5">进程调度</h2>
+
+<ul>
+<li>进程调度的基本概念
+
+<ul>
+<li>调度的层次
+
+<ul>
+<li>高级调度 <code>从后备队列中选择一批合适的作业调入内存，并创建相应进程</code></li>
+<li>低级调度 <code>从就绪队列中选择一个合适的进程，令其投入运行</code></li>
+<li>中级调度 <code>负责进程在内存与外存之间的换入与换出</code></li>
+</ul></li>
+<li>进程调度功能
+
+<ul>
+<li>排队程序</li>
+<li>分派程序</li>
+<li>上下文切换程序</li>
+</ul></li>
+<li>进程调度方式
+
+<ul>
+<li>非抢占方式</li>
+<li>抢占方式
+
+<ul>
+<li>内核完全不可占</li>
+<li>内核部分可抢占</li>
+<li>内核完全可抢占</li>
+</ul></li>
+</ul></li>
+<li>进程调度时机</li>
+<li>选择进程调度方式及调度算法应考虑的因素
+
+<ul>
+<li>系统设计目标</li>
+<li>调度的公平性</li>
+<li>资源的均衡利用</li>
+<li>合理的系统开销</li>
+</ul></li>
+<li>调度性能的评价标准
+
+<ul>
+<li>cpu的利用率</li>
+<li>系统吞吐量</li>
+<li>周转时间和带权周转时间 <code>提交到完成，带权周转时间=周转时间/要求服务时间</code></li>
+<li>响应时间 <code>提交到响应</code></li>
+<li>对截止时间的保证</li>
+</ul></li>
+</ul></li>
+<li>进程调度算法
+
+<ul>
+<li>先来先服务调度算法 <code>非抢占,有利于长作业不利于短作业,系统平均周转时间长,不能保证紧迫型任务得到及时处理</code></li>
+<li>短作业优先调度算法 <code>可抢占,最短平均周转时间,对长作业不利,不能保证紧迫型任务得到及时处理</code></li>
+<li>高响应比优先调度算法 <code>响应比=1+等待时间/要求服务时间,避免了饥饿,增加了系统开销,不能保证紧迫型任务得到及时处理</code></li>
+<li>优先级调度算法 <code>可抢占</code></li>
+<li>时间片轮转调度算法 <code>理想：响应时间=就绪进程数量*时间片</code></li>
+<li>多级队列调度算法 <code>抢占,实时进程:抢占,系统进程:非抢占,交互式进程:时间片轮转,批处理进程:先来先服务或短作业,实现简单 调度开销小 不够灵活 低优先级饥饿</code></li>
+<li>多级反馈队列调度算法 <code>抢占,时间片递增,长作业饥饿</code></li>
+</ul></li>
+<li>linux进程调度算法解析</li>
+</ul>
+
+<h2 id="toc_6">进程通信</h2>
+
+<ul>
+<li>进程通信类型
+
+<ul>
+<li>共享存储器系统通信 <code>在存储器中划出一块共享存储区，诸进程通过对共享存储区的读写操作来实现通信</code></li>
+<li>消息传递系统通信<code>可实现不同主机间多个进程的通信</code>
+
+<ul>
+<li>直接通信的方式
+
+<ul>
+<li>阻塞发送，阻塞接收</li>
+<li>无阻塞发送，无阻塞接收</li>
+<li>无阻塞发送，阻塞接收</li>
+</ul></li>
+<li>间接通信方式 <code>信箱头 信箱体</code>
+
+<ul>
+<li>私用信箱</li>
+<li>公用信箱</li>
+<li>共享信箱</li>
+</ul></li>
+</ul></li>
+<li>管道通信 <code>管道文件:连接两个进程以实现它们之间通信的一个打开的共享文件 描述符fd[] FIFO 对管道的读写操作必须互斥进行、必须同步进行 只有确定通信双方都存在时才能进行管道通信</code>
+
+<ul>
+<li>无名管道 <code>存在于高速缓存中的临时文件，没有对应磁盘映像，常用于有亲缘关系的父子进程或兄弟进程之间的通信</code></li>
+<li>有名管道<code>可用于系统中任意进程间的通信，可以在文件系统中长期存在具有路径名的文件</code></li>
+</ul></li>
+<li>客户-服务器系统通信
+
+<ul>
+<li>Socket（套接字）<code>网络地址 连接类型 网络规程</code></li>
+<li>远程过程调用（RPC）<code>允许客户机上的进程通过网络调用位于远程主机上的过程，不需要了解底层网络通信技术的实现细节，调用的实现过程对客户进程是透明的，采用客户/服务器结构实现</code></li>
+</ul></li>
+</ul></li>
+<li>消息缓冲队列通信机制
+
+<ul>
+<li>消息缓冲队列通信机制中的数据结构
+
+<ul>
+<li>消息缓冲区</li>
+<li>缓冲区队列</li>
+<li>PCB中与通信有关的数据项</li>
+</ul></li>
+<li>发送原语send()
+
+<ul>
+<li>向系统申请一个空闲消息缓冲区</li>
+<li>将发送区a中的信息复制到该空闲消息缓冲区中</li>
+<li>将保存着待发送消息的消息缓冲区插入到接收进程的消息队列中</li>
+</ul></li>
+<li>接收原语receive()
+
+<ul>
+<li>首先从自己的消息队列中取出第一个或指定的消息缓冲区</li>
+<li>把该消息缓冲区中的信息复制到接收区B中</li>
+<li>释放改消息缓冲区</li>
+</ul></li>
+</ul></li>
+<li>linux进程通信机制
+
+<ul>
+<li>linux管道通信机制
+
+<ul>
+<li>无名管道</li>
+<li>有名管道 FIFO</li>
+</ul></li>
+<li>linux的IPC消息队列通信机制
+
+<ul>
+<li>IPC消息队列通信机制中的相关数据结构
+
+<ul>
+<li>消息缓冲区struct msgbuf</li>
+<li>消息结构 msg_msg</li>
+<li>消息队列结构 msg_queue</li>
+</ul></li>
+<li>IPC消息队列相关的系统调用
+
+<ul>
+<li>int msgget(key_t key,int msgflg);</li>
+<li>int msgsnd(int msqid,struct msgbuf *msgp,size_t msgsz,int msgflg);</li>
+<li>ssize_t msgrcv(int msqid,struct msgbuf *msgp,size_t msgsz,long msgtyp,int msgflg);</li>
+<li>int msgctl(int msqid,int cmd,struct msqid_ds *buf);</li>
+</ul></li>
+</ul></li>
+<li>linux共享内存通信</li>
+<li>共享内存通信机制中的数据结构 <code>shmid_kernel</code></li>
+<li>共享内存机制的相关系统调用
+
+<ul>
+<li>int shmget(key_t key,int size,int shmfig);</li>
+<li>void *shmat(int shmid,const void *shmaddr,int shmgflg);</li>
+<li>int shmdt(const void *shmaddr);</li>
+<li>int shmctl(int shmid,int cmd,struct shmid_ds *buff);</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2 id="toc_7">进程死锁</h2>
+
+<ul>
+<li>死锁的基本概念
+
+<ul>
+<li>死锁的概念 <code>若系统中存在一组进程，它们中的每一个都无限等待被该组进程中另一进程所占用的且永远无法释放的资源</code></li>
+<li>产生死锁的原因
+
+<ul>
+<li>竞争资源 <code>若系统中有多个进程要共享某些资源，而这些资源的数量又不能同时满足各进程的需要，便会引起各进程对资源的竞争从而可能导致死锁</code></li>
+<li>请求或释放资源的时机不当 <code>异步性特征 资源请求和释放顺序不合理</code></li>
+</ul></li>
+<li>产生死锁的必要条件
+
+<ul>
+<li>互斥条件 <code>某个资源在一段时间内只能由一个进程占用，一旦将其分配给某进程后，必须等待改进程使用完成、主动释放它之后，才能再次分配给其它进程使用</code></li>
+<li>占有且等待条件 <code>进程已占有至少一个资源，又申请新的资源，由于该资源已被分配给别的进程，则该进程阻塞，但它在等待新资源时，仍继续占有已分到的资源</code></li>
+<li>不可剥夺条件 <code>一个程序所占有的不可剥夺资源在它使用完之前，系统不能强行剥夺，只能由该进程使用完之后主动释放</code></li>
+<li>循环等待条件 <code>系统中若干进程之间对资源的占有和请求形成了循环等待的关系，此时环路中的每个进程都已经占有一些资源，同时又在等待其相邻进程所占有的资源</code></li>
+</ul></li>
+<li>处理死锁的基本方法
+
+<ul>
+<li>预防死锁 <code>进程申请资源或系统分配资源时必须遵循某些预先设置的闲置条件，破坏产生死锁的条件 (资源利用率低)</code></li>
+<li>避免死锁 <code>在资源分配的过程中，用某些方法防止系统进入不安全状态(资源利用率和系统吞吐量高)</code></li>
+<li>检测和解除死锁 <code>设置死锁检测机构，及时地检测出系统是否出现死锁，并确定与死锁有关的进程和资源</code></li>
+</ul></li>
+</ul></li>
+<li>预防死锁
+
+<ul>
+<li>破坏占有且等待条件
+
+<ul>
+<li>静态分配资源 <code>执行前申请所需全部资源</code></li>
+<li>要求进程在不占有资源时才可申请资源 <code>允许动态申请，申请前必须释放</code></li>
+</ul></li>
+<li>破坏不可剥夺条件 <code>如果一个已经占有某些资源的进程请求新的资源而又不能立即得到满足时，它当前已占有的资源可以被其他进程剥夺，只有在它获得原有被剥夺资源和所申请的新资源时，才能重新继续运行</code></li>
+<li>破坏循环等待条件 <code>按序分配资源</code></li>
+</ul></li>
+<li>避免死锁
+
+<ul>
+<li>安全状态 <code>安全序列</code></li>
+<li>银行家算法
+
+<ul>
+<li>银行家算法中的数据结构
+
+<ul>
+<li>可利用资源Available[m]</li>
+<li>最大需求矩阵Max[n][m]</li>
+<li>分配矩阵Allocation[n][m]</li>
+<li>需求矩阵Need[n][m]
+<code>Need[i][j] = Max[i][j] - Allocation[i][j]</code></li>
+</ul></li>
+<li>安全性算法
 
 <ol>
-<li>如下也是一个死锁的例子:</li>
-</ol>
-
-<pre><code>var ch1 chan int = make(chan int)
-var ch2 chan int = make(chan int)
-
-func say(s string) {
-    fmt.Println(s)
-    ch1 &lt;- &lt;- ch2 // ch1 等待 ch2流出的数据
-}
-
-func main() {
-    go say(&quot;hello&quot;)
-    &lt;- ch1  // 堵塞主线
-}
-</code></pre>
-
-<p>其中主线等ch1中的数据流出,ch1等ch2的数据流出,但是ch2等待数据流入,两个goroutine都在等,也就是死锁。</p>
+<li>设置两个向量 系统某时刻能够提供的各类资源的可用数量Work=Available，系统是否有足够资源分配给进程 Finish[i] = False</li>
+<li>寻找Finish[i]=False且Need[i][j]&lt;=Wrok[j] 若存在执行3 否则执行4</li>
+<li>释放占据的资源 Work=Work+Allocation[i] Finish[i]=False 返回2</li>
+<li>若所有Finish[i]=True 则系统处于安全状态 否则不安全</li>
+</ol></li>
+<li>银行家算法 
 
 <ol>
-<li>其实,总结来看,为什么会死锁？非缓冲信道上如果发生了流入无流出,或者流出无流入,也就导致了死锁。或者这样理解 Go启动的所有goroutine里的非缓冲信道一定要一个线里存数据,一个线里取数据,要成对才行 。所以下面的示例一定死锁:</li>
-</ol>
-
-<pre><code>c, quit := make(chan int), make(chan int)
-go func() {
-   c &lt;- 1  // c通道的数据没有被其他goroutine读取走,堵塞当前goroutine
-   quit &lt;- 0 // quit始终没有办法写入数据
-}()
-
-&lt;- quit // quit 等待数据的写
-</code></pre>
-
-<p>仔细分析的话,是由于：主线等待quit信道的数据流出,quit等待数据写入,而func被c通道堵塞,所有goroutine都在等,所以死锁。</p>
-
-<p>简单来看的话,一共两个线,func线中流入c通道的数据并没有在main线中流出,肯定死锁。</p>
-
-<p>但是,是否果真 所有不成对向信道存取数据的情况都是死锁?</p>
-
-<p>如下是个反例:  </p>
-
-<pre><code>func main() {
-    c := make(chan int)
-
-    go func() {
-       c &lt;- 1
-    }()
-}
-</code></pre>
-
-<p>程序正常退出了,很简单,并不是我们那个总结不起作用了,还是因为一个让人很囧的原因,main又没等待其它goroutine,自己先跑完了,所以没有数据流入c信道,一共执行了一个goroutine,并且没有发生阻塞,所以没有死锁错误。</p>
-
-<p>那么死锁的解决办法呢？</p>
-
-<p>最简单的,把没取走的数据取走,没放入的数据放入, 因为无缓冲信道不能承载数据,那么就赶紧拿走！</p>
-
-<p>具体来讲,就死锁例子3中的情况,可以这么避免死锁:  </p>
-
-<pre><code>c, quit := make(chan int), make(chan int)
-
-go func() {
-    c &lt;- 1
-    quit &lt;- 0
-}()
-
-&lt;- c // 取走c的数据！
-&lt;-quit
-</code></pre>
-
-<p>另一个解决办法是缓冲信道, 即设置c有一个数据的缓冲大小:  </p>
-
-<pre><code>c := make(chan int, 1)
-</code></pre>
-
-<p>这样的话,c可以缓存一个数据。也就是说,放入一个数据,c并不会挂起当前线, 再放一个才会挂起当前线直到第一个数据被其他goroutine取走, 也就是只阻塞在容量一定的时候,不达容量不阻塞。<br/>
-这十分类似我们Python中的队列Queue不是吗？</p>
-
-<h3 id="toc_3">无缓冲信道的数据进出顺序</h3>
-
-<p>我们已经知道,无缓冲信道从不存储数据,流入的数据必须要流出才可以。</p>
-
-<p>观察以下的程序:  </p>
-
-<pre><code>var ch chan int = make(chan int)
-
-func foo(id int) { //id: 这个routine的标号
-    ch &lt;- id
-}
-
-func main() {
-    // 开启5个routine
-    for i := 0; i &lt; 5; i++ {
-        go foo(i)
-    }
-
-    // 取出信道中的数据
-    for i := 0; i &lt; 5; i++ {
-        fmt.Print(&lt;- ch)
-    }
-}
-</code></pre>
-
-<p>我们开了5个goroutine,然后又依次取数据。其实整个的执行过程细分的话,5个线的数据 依次流过信道ch, main打印之, 而宏观上我们看到的即 无缓冲信道的数据是先到先出,但是 无缓冲信道并不存储数据,只负责数据的流通</p>
-
-<h3 id="toc_4">缓冲信道</h3>
-
-<p>终于到了这个话题了, 其实缓存信道用英文来讲更为达意: buffered channel.</p>
-
-<p>缓冲这个词意思是,缓冲信道不仅可以流通数据,还可以缓存数据。它是有容量的,存入一个数据的话 , 可以先放在信道里,不必阻塞当前线而等待该数据取走。</p>
-
-<p>当缓冲信道达到满的状态的时候,就会表现出阻塞了,因为这时再也不能承载更多的数据了,「你们必须把 数据拿走,才可以流入数据」。</p>
-
-<p>在声明一个信道的时候,我们给<code>make</code>以第二个参数来指明它的容量(默认为0,即无缓冲):  </p>
-
-<pre><code>var ch chan int = make(chan int, 2) // 写入2个元素都不会阻塞
-</code></pre>
-
-<p>当前goroutine, 存储个数达到2的时候会阻塞<br/>
-如下的例子,缓冲信道ch可以无缓冲的流入3个元素:  </p>
-
-<pre><code>func main() {
-    ch := make(chan int, 3)
-    ch &lt;- 1
-    ch &lt;- 2
-    ch &lt;- 3
-}
-</code></pre>
-
-<p>如果你再试图流入一个数据的话,信道ch会阻塞main线, 报死锁。</p>
-
-<p>也就是说,缓冲信道会在满容量的时候加锁。</p>
-
-<p>其实,缓冲信道是先进先出的,我们可以把缓冲信道看作为一个线程安全的队列： </p>
-
-<pre><code>func main() {
-    ch := make(chan int, 3)
-    ch &lt;- 1
-    ch &lt;- 2
-    ch &lt;- 3
-
-    fmt.Println(&lt;-ch) // 1
-    fmt.Println(&lt;-ch) // 2
-    fmt.Println(&lt;-ch) // 3
-}
-</code></pre>
-
-<h3 id="toc_5">信道数据读取和信道关闭</h3>
-
-<p>你也许发现,上面的代码一个一个地去读取信道简直太费事了,Go语言允许我们使用range来读取信道:  </p>
-
-<pre><code>func main() {
-    ch := make(chan int, 3)
-    ch &lt;- 1
-    ch &lt;- 2
-    ch &lt;- 3
-
-    for v := range ch {
-        fmt.Println(v)
-    }
-}
-</code></pre>
-
-<p>如果你执行了上面的代码,会报死锁错误的,原因是range不等到信道关闭是不会结束读取的。也就是如果 缓冲信道干涸了,那么range就会阻塞当前goroutine, 所以死锁咯。</p>
-
-<p>那么,我们试着避免这种情况,比较容易想到的是读到信道为空的时候就结束读取:  </p>
-
-<pre><code>ch := make(chan int, 3)
-ch &lt;- 1
-ch &lt;- 2
-ch &lt;- 3
-for v := range ch {
-    fmt.Println(v)
-    if len(ch) &lt;= 0 { // 如果现有数据量为0,跳出循环
-        break
-    }
-}
-</code></pre>
-
-<p>以上的方法是可以正常输出的,但是注意检查信道大小的方法不能在信道存取都在发生的时候用于取出所有数据,这个例子 是因为我们只在ch中存了数据,现在一个一个往外取,信道大小是递减的。</p>
-
-<p>另一个方式是显式地关闭信道:  </p>
-
-<pre><code>ch := make(chan int, 3)
-ch &lt;- 1
-ch &lt;- 2
-ch &lt;- 3
-
-// 显式地关闭信道
-close(ch)
-
-for v := range ch {
-    fmt.Println(v)
-}
-</code></pre>
-
-<p>被关闭的信道会禁止数据流入, 是只读的。我们仍然可以从关闭的信道中取出数据,但是不能再写入数据了。</p>
-
-<h3 id="toc_6">等待多gorountine的方案</h3>
-
-<p>那好,我们回到最初的一个问题,使用信道堵塞主线,等待开出去的所有goroutine跑完。</p>
-
-<p>这是一个模型,开出很多小goroutine, 它们各自跑各自的,最后跑完了向主线报告。</p>
-
-<p>我们讨论如下2个版本的方案:</p>
-
-<ol>
-<li>只使用单个无缓冲信道阻塞主线</li>
-<li>使用容量为goroutines数量的缓冲信道</li>
-</ol>
-
-<p>对于方案1, 示例的代码大概会是这个样子:  </p>
-
-<pre><code>var quit chan int // 只开一个信道
-
-func foo(id int) {
-    fmt.Println(id)
-    quit &lt;- 0 // ok, finished
-}
-
-func main() {
-    count := 1000
-    quit = make(chan int) // 无缓冲
-
-    for i := 0; i &lt; count; i++ {
-        go foo(i)
-    }
-
-    for i := 0; i &lt; count; i++ {
-        &lt;- quit
-    }
-}
-</code></pre>
-
-<p>对于方案2, 把信道换成缓冲1000的:  </p>
-
-<pre><code>quit = make(chan int, count) // 容量1000
-</code></pre>
-
-<p>其实区别仅仅在于一个是缓冲的，一个是非缓冲的。</p>
-
-<p>对于这个场景而言，两者都能完成任务, 都是可以的。</p>
+<li>如果Request[i]&lt;=Need[i]执行2，否则出错</li>
+<li>如果Request[i]&lt;=Available 执行3，否则等待</li>
+<li>Available -= Request  Allocation += Request  Need -= Request  执行4</li>
+<li>执行安全性算法，若不满足，则分配资源无效，阻塞等待，恢复原来的资源分配状态</li>
+</ol></li>
+</ul></li>
+</ul></li>
+<li>死锁的检测与解除
 
 <ul>
-<li><p>无缓冲的信道是一批数据一个一个的「流进流出」</p></li>
-<li><p>缓冲信道则是一个一个存储，然后一起流出去</p></li>
-</ul>
-
-<h3 id="toc_7">Go语言的并发和并行</h3>
-
-<p>不知道你有没有注意到一个现象，还是这段代码，如果我跑在两个goroutines里面的话:    </p>
-
-<pre><code>var quit chan int = make(chan int)
-
-func loop() {
-    for i := 0; i &lt; 10; i++ {
-        fmt.Printf(&quot;%d &quot;, i)
-    }
-    quit &lt;- 0
-}
-
-
-func main() {
-    // 开两个goroutine跑函数loop, loop函数负责打印10个数
-    go loop()
-    go loop()
-
-    for i := 0; i &lt; 2; i++ {
-        &lt;- quit
-    }
-}
-</code></pre>
-
-<p>我们观察下输出:  </p>
-
-<p><code>0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9</code><br/>
-这是不是有什么问题？?</p>
-
-<p>以前我们用线程去做类似任务的时候，系统的线程会抢占式地输出， 表现出来的是乱序地输出。而goroutine为什么是这样输出的呢？</p>
-
-<h3 id="toc_8">goroutine是在并行吗？</h3>
-
-<p>我们找个例子测试下:  </p>
-
-<pre><code>package main
-
-import &quot;fmt&quot;
-import &quot;time&quot;
-
-var quit chan int
-
-func foo(id int) {
-    fmt.Println(id)
-    time.Sleep(time.Second) // 停顿一秒
-    quit &lt;- 0 // 发消息：我执行完啦！
-}
-
-
-func main() {
-    count := 1000
-    quit = make(chan int, count) // 缓冲1000个数据
-
-    for i := 0; i &lt; count; i++ { //开1000个goroutine
-        go foo(i)
-    }
-
-    for i :=0 ; i &lt; count; i++ { // 等待所有完成消息发送完毕。
-        &lt;- quit
-    }
-}
-</code></pre>
-
-<p>让我们跑一下这个程序(之所以先编译再运行，是为了让程序跑的尽量快,测试结果更好):  </p>
-
-<pre><code>go build test.go
-time ./test
-./test  0.01s user 0.01s system 1% cpu 1.016 total
-</code></pre>
-
-<p>我们看到，总计用时接近一秒。 貌似并行了！</p>
-
-<p>我们需要首先考虑下什么是并发, 什么是并行</p>
-
-<h3 id="toc_9">并行和并发</h3>
-
-<p>从概念上讲，并发和并行是不同的  </p>
+<li>资源分配图</li>
+<li>死锁定理 <code>可完全简化：无死锁</code></li>
+<li>死锁检测算法 <code>Coffman算法</code></li>
+<li>死锁检测时机
 
 <ul>
-<li>两个队列，一个Coffee机器，那是并发</li>
-<li>两个队列，两个Coffee机器，那是并行
-更多的资料： 并发不是并行, 当然Google上有更多关于并行和并发的区别。</li>
-</ul>
-
-<p>那么回到一开始的疑问上，从上面的两个例子执行后的表现来看，多个goroutine跑loop函数会挨个goroutine去进行，而sleep则是一起执行的。</p>
-
-<p>这是为什么？</p>
-
-<p>默认地， <code>Go</code>所有的goroutines只能在一个线程里跑 。</p>
-
-<p>也就是说， 以上两个代码都不是并行的，但是都是是并发的。</p>
-
-<p>如果当前goroutine不发生阻塞，它是不会让出CPU给其他goroutine的, 所以例子一中的输出会是一个一个goroutine进行的，而sleep函数则阻塞掉了 当前goroutine, 当前goroutine主动让其他goroutine执行, 所以形成了逻辑上的并行, 也就是并发。</p>
-
-<h3 id="toc_10">真正的并行</h3>
-
-<p>为了达到真正的并行，我们需要告诉Go我们允许同时最多使用多个核。</p>
-
-<p>回到起初的例子，我们设置最大开2个原生线程, 我们需要用到runtime包(runtime包是goroutine的调度器):  </p>
-
-<pre><code>import (
-    &quot;fmt&quot;
-    &quot;runtime&quot;
-)
-
-var quit chan int = make(chan int)
-
-func loop() {
-    for i := 0; i &lt; 100; i++ { //为了观察，跑多些
-        fmt.Printf(&quot;%d &quot;, i)
-    }
-    quit &lt;- 0
-}
-
-func main() {
-    runtime.GOMAXPROCS(2) // 最多使用2个核
-
-    go loop()
-    go loop()
-
-    for i := 0; i &lt; 2; i++ {
-        &lt;- quit
-    }
-}
-</code></pre>
-
-<p>这下会看到两个goroutine会抢占式地输出数据了。</p>
-
-<p>我们还可以这样显式地让出CPU时间： </p>
-
-<pre><code>func loop() {
-    for i := 0; i &lt; 10; i++ {
-        runtime.Gosched() // 显式地让出CPU时间给其他goroutine
-        fmt.Printf(&quot;%d &quot;, i)
-    }
-    quit &lt;- 0
-}
-
-
-func main() {
-
-    go loop()
-    go loop()
-
-    for i := 0; i &lt; 2; i++ {
-        &lt;- quit
-    }
-}
-</code></pre>
-
-<p>观察下结果会看到这样有规律的输出:</p>
-
-<p><code>0 0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9</code><br/>
-其实，这种主动让出CPU时间的方式仍然是在单核里跑。但手工地切换goroutine导致了看上去的“并行”。</p>
-
-<p>其实作为一个Python程序员，goroutine让我更多地想到的是gevent的协程，而不是原生线程。</p>
-
-<p>关于runtime包对goroutine的调度，在stackoverflow上有一个不错的答案:<a href="http://stackoverflow.com/questions/13107958/what-exactly-does-runtime-gosched-do">http://stackoverflow.com/questions/13107958/what-exactly-does-runtime-gosched-do</a></p>
-
-<h3 id="toc_11">一个小问题</h3>
-
-<p>我在Segmentfault看到了这个问题: <a href="http://segmentfault.com/q/1010000000207474">http://segmentfault.com/q/1010000000207474</a></p>
-
-<p>题目说，如下的程序，按照理解应该打印下5次 &quot;world&quot;呀，可是为什么什么也没有打印  </p>
-
-<pre><code>package main
-
-import (
-    &quot;fmt&quot;
-)
-
-func say(s string) {
-    for i := 0; i &lt; 5; i++ {
-        fmt.Println(s)
-    }
-}
-
-func main() {
-    go say(&quot;world&quot;) //开一个新的Goroutines执行
-    for {
-    }
-}
-</code></pre>
-
-<p>楼下的答案已经很棒了，这里Go仍然在使用单核，for死循环占据了单核CPU所有的资源，而main线和say两个goroutine都在一个线程里面， 所以say没有机会执行。解决方案还是两个：</p>
+<li>每当进程请求资源且得不到满足时就做检测</li>
+<li>周期性定时检测</li>
+<li>依据cpu利用率确定是否进行检测</li>
+</ul></li>
+<li>死锁的解除</li>
+<li>撤销进程
 
 <ul>
-<li>允许Go使用多核(runtime.GOMAXPROCS)</li>
-<li>手动显式调动(runtime.Gosched)</li>
-</ul>
-
-<h3 id="toc_12">runtime调度器</h3>
-
-<p>runtime调度器是个很神奇的东西，但是我真是但愿它不存在，我希望显式调度能更为自然些，多核处理默认开启。</p>
-
-<p>关于runtime包几个函数:</p>
+<li>撤销所有死锁进程</li>
+<li>一次只撤销一个死锁进程直到解除死锁为止</li>
+</ul></li>
+<li>抢占资源 <code>逐步抢占部分死锁进程的资源给其他进程使用，并挂起被强占资源的进程，直至解除死锁为止</code>
 
 <ul>
-<li><p>Gosched 让出cpu</p></li>
-<li><p>NumCPU 返回当前系统的CPU核数量</p></li>
-<li><p>GOMAXPROCS 设置最大的可同时使用的CPU核数</p></li>
-<li><p>Goexit 退出当前goroutine(但是defer语句会照常执行)</p></li>
+<li>在选择被抢占资源的进程时要考虑代价问题</li>
+<li>&quot;回滚问题&quot;</li>
+<li>避免饥饿现象
+<code>n个进程需要m个同类资源需要最少资源数n(m-1)+1</code></li>
+</ul></li>
+</ul></li>
 </ul>
 
-<h3 id="toc_13">总结</h3>
-
-<p>我们从例子中可以看到，默认的, 所有goroutine会在一个原生线程里跑，也就是只使用了一个CPU核。</p>
-
-<p>在同一个原生线程里，如果当前goroutine不发生阻塞，它是不会让出CPU时间给其他同线程的goroutines的，这是Go运行时对goroutine的调度，我们也可以使用runtime包来手工调度。</p>
-
-<p>本文开头的两个例子都是限制在单核CPU里执行的，所有的goroutines跑在一个线程里面，分析如下:</p>
-
-<p>对于代码例子一（loop函数的那个），每个goroutine没有发生堵塞(直到quit流入数据), 所以在quit之前每个goroutine不会主动让出CPU，也就发生了串行打印<br/>
-对于代码例子二（time的那个），每个goroutine在sleep被调用的时候会阻塞，让出CPU, 所以例子二并发执行。<br/>
-那么关于我们开启多核的时候呢？Go语言对goroutine的调度行为又是怎么样的？</p>
-
-<p>我们可以在Golang官方网站的这里 找到一句话:</p>
-
-<blockquote>
-<p>When a coroutine blocks, such as by calling a blocking system call, the run-time automatically moves other coroutines on the same operating system thread to a different, runnable thread so they won&#39;t be blocked.<br/>
-也就是说:</p>
-</blockquote>
-
-<p>当一个goroutine发生阻塞，Go会自动地把与该goroutine处于同一系统线程的其他goroutines转移到另一个系统线程上去，以使这些goroutines不阻塞</p>
-
-<h3 id="toc_14">开启多核的实验</h3>
-
-<p>仍然需要做一个实验，来测试下多核支持下goroutines的对原生线程的分配, 也验证下我们所得到的结论“goroutine不阻塞不放开CPU”。</p>
-
-<p>实验代码如下:  </p>
-
-<pre><code>package main
-
-import (
-    &quot;fmt&quot;
-    &quot;runtime&quot;
-)
-
-var quit chan int = make(chan int)
-
-func loop(id int) { // id: 该goroutine的标号
-    for i := 0; i &lt; 10; i++ { //打印10次该goroutine的标号
-        fmt.Printf(&quot;%d &quot;, id)
-    }
-    quit &lt;- 0
-}
-
-func main() {
-    runtime.GOMAXPROCS(2) // 最多同时使用2个核
-
-    for i := 0; i &lt; 3; i++ { //开三个goroutine
-        go loop(i)
-    }
-
-    for i := 0; i &lt; 3; i++ {
-        &lt;- quit
-    }
-}
-</code></pre>
-
-<p>多跑几次会看到类似这些输出(不同机器环境不一样):  </p>
-
-<pre><code>0 0 0 0 0 1 1 0 0 1 0 0 1 0 1 2 1 2 1 2 1 2 1 2 1 2 2 2 2 2
-0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2
-0 0 0 0 0 0 0 1 1 1 1 1 0 1 0 1 0 1 2 1 2 1 2 2 2 2 2 2 2 2
-0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 0 2 0 2 0 2 2 2 2 2 2 2 2
-0 0 0 0 0 0 0 1 0 0 1 0 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 2 2
-</code></pre>
-
-<p>执行它我们会发现以下现象:</p>
+<h2 id="toc_8">线程机制</h2>
 
 <ul>
-<li>有时会发生抢占式输出(说明Go开了不止一个原生线程，达到了真正的并行)</li>
-<li>有时会顺序输出, 打印完0再打印1, 再打印2(说明Go开一个原生线程，单线程上的goroutine不阻塞不松开CPU)</li>
-</ul>
-
-<p>那么，我们还会观察到一个现象，无论是抢占地输出还是顺序的输出，都会有那么两个数字表现出这样的现象:</p>
+<li>线程基本概念
 
 <ul>
-<li>一个数字的所有输出都会在另一个数字的所有输出之前</li>
+<li>线程的引入 <code>解决基于同数据区的同时多请求</code></li>
+<li>什么是线程
+
+<ul>
+<li>一个线程ID</li>
+<li>一组寄存器集合</li>
+<li>两个栈</li>
+<li>一个私有存储区</li>
+<li>线程控制块TCB</li>
+</ul></li>
+<li>进程和线程的比较
+
+<ul>
+<li>调度 <code>传统的操作系统中，进程既是资源分配和拥有的基本单位，又是独立调度和执行的基本单位。而引入线程后，则把线程作为调度和执行的基本单位，把进程作为资源分配和拥有的基本单位，将传统进程的两个属性分开，使线程轻装运行，从而显著提高系统的并发程度，降低CPU切换开销。同一进程中两个线程的切换不会引起进程切换，但不同进程中的两个线程切换将会引起进程切换</code></li>
+<li>并发性 <code>引入线程后，不仅进程间可并发执行，而且一个进程中的多个线程间也能并发执行，系统并发度更高，能更有效地使用系统资源和提高体统吞吐量</code></li>
+<li>拥有资源 <code>线程基本上不拥有资源，但它可以访问所属进程的全部资源</code></li>
+<li>系统开销 <code>系统在创建进程时，必须为之分配资源，建立进程虚拟空间及相关数据结构，还要建立PCB，系统所付出的开销将显著大于创建线程的开销。进程切换时，需要切换进程的上下文，而线程切换只需要保存和设置少量寄存器内容，不涉及存储管理方面的操作，同一进程中多个线程间的数据共享及通讯是通过直接读写该进程空间的公用数据来完成，不需要写入操作系统的内核</code></li>
+</ul></li>
+<li>线程管理
+
+<ul>
+<li>线程状态
+
+<ul>
+<li>就绪状态</li>
+<li>运行状态</li>
+<li>阻塞状态</li>
+<li>终止状态</li>
+</ul></li>
+<li>线程控制
+
+<ul>
+<li>线程创建</li>
+<li>线程终止</li>
+<li>线程阻塞</li>
+<li>线程唤醒</li>
+</ul></li>
+<li>线程同步</li>
+<li>线程调度</li>
+<li>线程通信</li>
+</ul></li>
+<li>多线程的应用</li>
+</ul></li>
+<li>线程的实现机制
+
+<ul>
+<li>用户级线程ULT 
+
+<ul>
+<li>优点<code>线程切换速度快、调度算法可以是应用程序专用的、用户级线程可运行在任何操作系统上</code></li>
+<li>问题 <code>线程系统调用的阻塞问题、纯用户级线程机制不能利用多处理器的优势</code></li>
+</ul></li>
+<li>内核级线程KLT <code>在内核空间实现 所有管理工作都由内核完成</code>
+
+<ul>
+<li>优点 <code>线程执行系统调用时仅阻塞调用线程本身、在多处理器环境下一个进程的多个线程可以同时在多个cpu上并行执行、操作系统内核本身可以采用多线程机制</code></li>
+<li>问题 <code>开销较大</code></li>
+</ul></li>
+<li>组合方式
+
+<ul>
+<li>多对一模型</li>
+<li>一对一模型</li>
+<li>多对多模型</li>
+</ul></li>
+</ul></li>
+<li>Linux线程机制</li>
 </ul>
-
-<p>原因是， 3个goroutine分配到至多2个线程上，就会至少两个goroutine分配到同一个线程里，单线程里的goroutine 不阻塞不放开CPU, 也就发生了顺序输出。</p>
-
-<h3 id="toc_15">生成器</h3>
-
-<p>在Python中我们可以使用yield关键字来让一个函数成为生成器，在Go中我们可以使用信道来制造生成器(一种lazy load类似的东西)。</p>
-
-<p>当然我们的信道并不是简单的做阻塞主线的功能来使用的哦。</p>
-
-<p>下面是一个制作自增整数生成器的例子，直到主线向信道索要数据，我们才添加数据到信道  </p>
-
-<pre><code>func xrange() chan int{ // xrange用来生成自增的整数
-    var ch chan int = make(chan int)
-
-    go func() { // 开出一个goroutine
-        for i := 0; ; i++ {
-            ch &lt;- i  // 直到信道索要数据，才把i添加进信道
-        }
-    }()
-
-    return ch
-}
-
-func main() {
-
-    generator := xrange()
-
-    for i:=0; i &lt; 1000; i++ {  // 我们生成1000个自增的整数！
-        fmt.Println(&lt;-generator)
-    }
-}
-</code></pre>
-
-<p>这不禁叫我想起了Python中可爱的xrange, 所以给了生成器这个名字！</p>
-
-<h3 id="toc_16">服务化</h3>
-
-<p>比如我们加载一个网站的时候，例如我们登入新浪微博，我们的消息数据应该来自一个独立的服务，这个服务只负责 返回某个用户的新的消息提醒。</p>
-
-<p>如下是一个使用示例:  </p>
-
-<pre><code>func get_notification(user string) chan string{
-   /*
-    * 此处可以查询数据库获取新消息等等..
-    */
-    notifications := make(chan string)
-
-    go func() { // 悬挂一个信道出去
-        notifications &lt;- fmt.Sprintf(&quot;Hi %s, welcome to weibo.com!&quot;, user)
-    }()
-
-    return notifications
-}
-
-func main() {
-    jack := get_notification(&quot;jack&quot;) //  获取jack的消息
-    joe := get_notification(&quot;joe&quot;) // 获取joe的消息
-
-    // 获取消息的返回
-    fmt.Println(&lt;-jack)
-    fmt.Println(&lt;-joe)
-}
-</code></pre>
-
-<h3 id="toc_17">多路复合</h3>
-
-<p>上面的例子都使用一个信道作为返回值，可以把信道的数据合并到一个信道的。 不过这样的话，我们需要按顺序输出我们的返回值（先进先出）。</p>
-
-<p>如下，我们假设要计算很复杂的一个运算 100-x , 分为三路计算， 最后统一在一个信道中取出结果:  </p>
-
-<pre><code>func do_stuff(x int) int { // 一个比较耗时的事情，比如计算
-    time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond) //模拟计算
-    return 100 - x // 假如100-x是一个很费时的计算
-}
-
-func branch(x int) chan int{ // 每个分支开出一个goroutine做计算并把计算结果流入各自信道
-    ch := make(chan int)
-    go func() {
-        ch &lt;- do_stuff(x)
-    }()
-    return ch
-}
-
-func fanIn(chs... chan int) chan int {
-    ch := make(chan int)
-
-    for _, c := range chs {
-        // 注意此处明确传值
-        go func(c chan int) {ch &lt;- &lt;- c}(c) // 复合
-    }
-
-    return ch
-}
-
-
-func main() {
-    result := fanIn(branch(1), branch(2), branch(3))
-
-    for i := 0; i &lt; 3; i++ {
-        fmt.Println(&lt;-result)
-    }
-}
-</code></pre>
-
-<h3 id="toc_18">select监听信道</h3>
-
-<p>Go有一个语句叫做select，用于监测各个信道的数据流动。</p>
-
-<p>如下的程序是select的一个使用例子，我们监视三个信道的数据流出并收集数据到一个信道中。  </p>
-
-<pre><code>func foo(i int) chan int {
-    c := make(chan int)
-    go func () { c &lt;- i }()
-    return c
-}
-
-
-func main() {
-    c1, c2, c3 := foo(1), foo(2), foo(3)
-
-    c := make(chan int)
-
-    go func() { // 开一个goroutine监视各个信道数据输出并收集数据到信道c
-        for {
-            select { // 监视c1, c2, c3的流出，并全部流入信道c
-            case v1 := &lt;- c1: c &lt;- v1
-            case v2 := &lt;- c2: c &lt;- v2
-            case v3 := &lt;- c3: c &lt;- v3
-            }
-        }
-    }()
-
-    // 阻塞主线，取出信道c的数据
-    for i := 0; i &lt; 3; i++ {
-        fmt.Println(&lt;-c) // 从打印来看我们的数据输出并不是严格的1,2,3顺序
-    }
-}
-</code></pre>
-
-<p>有了select, 我们在 多路复合中的示例代码中的函数fanIn还可以这么来写(这样就不用开好几个goroutine来取数据了):  </p>
-
-<pre><code>func fanIn(branches ... chan int) chan int {
-    c := make(chan int)
-
-    go func() {
-        for i := 0 ; i &lt; len(branches); i++ { //select会尝试着依次取出各个信道的数据
-            select {
-            case v1 := &lt;- branches[i]: c &lt;- v1
-            }
-        }
-    }()
-
-    return c
-}
-</code></pre>
-
-<p>使用select的时候，有时需要超时处理, 其中的timeout信道相当有趣:  </p>
-
-<pre><code>timeout := time.After(1 * time.Second) // timeout 是一个计时信道, 如果达到时间了，就会发一个信号出来
-
-for is_timeout := false; !is_timeout; {
-    select { // 监视信道c1, c2, c3, timeout信道的数据流出
-    case v1 := &lt;- c1: fmt.Printf(&quot;received %d from c1&quot;, v1)
-    case v2 := &lt;- c2: fmt.Printf(&quot;received %d from c2&quot;, v2)
-    case v3 := &lt;- c3: fmt.Printf(&quot;received %d from c3&quot;, v3)
-    case &lt;- timeout: is_timeout = true // 超时
-    }
-}
-</code></pre>
-
-<h3 id="toc_19">结束标志</h3>
-
-<p>在Go并发与并行笔记一我们已经讲过信道的一个很重要也很平常的应用，就是使用无缓冲信道来阻塞主线，等待goroutine结束。</p>
-
-<p>这样我们不必再使用timeout。</p>
-
-<p>那么对上面的timeout来结束主线的方案作个更新：  </p>
-
-<pre><code>func main() {
-
-    c, quit := make(chan int), make(chan int)
-
-    go func() {
-        c &lt;- 2  // 添加数据
-        quit &lt;- 1 // 发送完成信号
-    } ()
-
-    for is_quit := false; !is_quit; {
-        select { // 监视信道c的数据流出
-        case v := &lt;-c: fmt.Printf(&quot;received %d from c&quot;, v)
-        case &lt;-quit: is_quit = true // quit信道有输出，关闭for循环
-        }
-    }
-}
-</code></pre>
-
-<h3 id="toc_20">菊花链</h3>
-
-<p>简单地来说，数据从一端流入，从另一端流出，看上去好像一个链表，不知道为什么要取这么个尴尬的名字。。</p>
-
-<p>菊花链的英文名字叫做: Daisy-chain, 它的一个应用就是做过滤器，比如我们来筛下100以内的素数(你需要先知道什么是筛法)</p>
-
-<p>程序有详细的注释，不再说明了。  </p>
-
-<pre><code>/*
- *  利用信道菊花链筛法求某一个整数范围的素数
- *  筛法求素数的基本思想是：把从1开始的、某一范围内的正整数从小到大顺序排列，
- *  1不是素数，首先把它筛掉。剩下的数中选择最小的数是素数，然后去掉它的倍数。
- *  依次类推，直到筛子为空时结束
- */
-package main
-
-import &quot;fmt&quot;
-
-func xrange() chan int{ // 从2开始自增的整数生成器
-    var ch chan int = make(chan int)
-
-    go func() { // 开出一个goroutine
-        for i := 2; ; i++ {
-            ch &lt;- i  // 直到信道索要数据，才把i添加进信道
-        }
-    }()
-
-    return ch
-}
-
-
-func filter(in chan int, number int) chan int {
-    // 输入一个整数队列，筛出是number倍数的, 不是number的倍数的放入输出队列
-    // in:  输入队列
-    out := make(chan int)
-
-    go func() {
-        for {
-            i := &lt;- in // 从输入中取一个
-
-            if i % number != 0 {
-                out &lt;- i // 放入输出信道
-            }
-        }
-    }()
-
-    return out
-}
-
-
-func main() {
-    const max = 100 // 找出100以内的所有素数
-    nums := xrange() // 初始化一个整数生成器
-    number := &lt;-nums  // 从生成器中抓一个整数(2), 作为初始化整数
-
-    for number &lt;= max { // number作为筛子，当筛子超过max的时候结束筛选
-        fmt.Println(number) // 打印素数, 筛子即一个素数
-        nums = filter(nums, number) //筛掉number的倍数
-        number = &lt;- nums  // 更新筛子
-    }
-}
-</code></pre>
-
-<h2 id="toc_21">3 随机数生成器</h2>
-
-<p>信道可以做生成器使用，作为一个特殊的例子，它还可以用作随机数生成器。如下是一个随机01生成器:  </p>
-
-<pre><code>func rand01() chan int {
-    ch := make(chan int)
-
-    go func () {
-        for {
-            select { //select会尝试执行各个case, 如果都可以执行，那么随机选一个执行
-            case ch &lt;- 0:
-            case ch &lt;- 1:
-            }
-        }
-    }()
-
-    return ch
-}
-
-
-func main() {
-    generator := rand01() //初始化一个01随机生成器
-
-    //测试，打印10个随机01
-    for i := 0; i &lt; 10; i++ {
-        fmt.Println(&lt;-generator)
-    }
-}
-</code></pre>
-
-<h3 id="toc_22">定时器</h3>
-
-<p>我们刚才其实已经接触了信道作为定时器, time包里的After会制作一个定时器。</p>
-
-<p>看看我们的定时器吧！  </p>
-
-<pre><code>/*
- * 利用信道做定时器
- */
-
-package main
-
-import (
-    &quot;fmt&quot;
-    &quot;time&quot;
-)
-
-
-func timer(duration time.Duration) chan bool {
-    ch := make(chan bool)
-
-    go func() {
-        time.Sleep(duration)
-        ch &lt;- true // 到时间啦！
-    }()
-
-    return ch
-}
-
-func main() {
-    timeout := timer(time.Second) // 定时1s
-
-    for {
-        select {
-        case &lt;- timeout:
-            fmt.Println(&quot;already 1s!&quot;) // 到时间
-            return  //结束程序
-        }
-    }
-}
-</code></pre>
 <br /><br /><br /><br /><br />
 </div><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
 </body>
