@@ -844,11 +844,14 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 
 <h3 id="toc_2">处理器指令</h3>
 
-<p><code>每条计算机指令必须包含处理器执行所需的信息:操作码、源操作数、目的操作数和下一条指令地址</code><br/>
-- 操作码 <code>指令要完成的具体操作</code><br/>
-- 源操作数 <code>具体操作所需要的输入</code><br/>
-- 目的操作数 <code>具体操作的结果</code><br/>
-- 下一条指令地址 <code>当前这条指令执行完成后去哪里取下一条指令</code></p>
+<p><code>每条计算机指令必须包含处理器执行所需的信息:操作码、源操作数、目的操作数和下一条指令地址</code></p>
+
+<ul>
+<li>操作码 <code>指令要完成的具体操作</code></li>
+<li>源操作数 <code>具体操作所需要的输入</code></li>
+<li>目的操作数 <code>具体操作的结果</code></li>
+<li>下一条指令地址 <code>当前这条指令执行完成后去哪里取下一条指令</code></li>
+</ul>
 
 <h3 id="toc_3">寻址方式</h3>
 
@@ -870,11 +873,16 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <li>相对寻址方式 <code>指令中给出的操作数地址其实是操作数位置相对于当前指令位置的偏移量</code></li>
 <li>基址寻址方式 <code>CPU中的基址寄存器的内容，加上变址寄存器的内容形成操作数的地址</code></li>
 <li>变址寻址方式 <code>CPU中某个变址寄存器的内容与偏移量相加来形成操作数地址</code></li>
-<li>块寻址方式 <code>经常用在输入输出指令中，以实现外存储器或外围设备同内存之间的数据块传送</code>
-###  寄存器
-<code>寄存器是中央处理器的组成成分，是有限存储容量的高速存储部件，可用来暂存指令、数据和地址。</code></li>
+<li>块寻址方式 <code>经常用在输入输出指令中，以实现外存储器或外围设备同内存之间的数据块传送</code></li>
 </ul></li>
-<li>寄存器分类
+</ul>
+
+<h3 id="toc_4">寄存器</h3>
+
+<p><code>寄存器是中央处理器的组成成分，是有限存储容量的高速存储部件，可用来暂存指令、数据和地址。</code></p>
+
+<ul>
+<li><p>寄存器分类</p>
 
 <ul>
 <li>数据寄存器 <code>储存整数数字</code></li>
@@ -887,7 +895,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <li>指令寄存器 <code>储存当前正在被执行的指令</code></li>
 <li>索引寄存器 <code>用于在程序运行过程中更改运算对象的地址</code></li>
 </ul></li>
-<li>X86寄存器
+<li><p>X86寄存器</p>
 
 <ul>
 <li>通用寄存器</li>
@@ -897,11 +905,11 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </ul></li>
 </ul>
 
-<h2 id="toc_4">存储系统</h2>
+<h2 id="toc_5">存储系统</h2>
 
 <p><code>存储系统是指计算机中由存放程序和数据的各种存储设备、控制部件及管理信息调度的设备（硬件）和算法（软件）所组成的系统</code></p>
 
-<h3 id="toc_5">高速缓存存储器Cache</h3>
+<h3 id="toc_6">高速缓存存储器Cache</h3>
 
 <ul>
 <li>组成结构
@@ -941,13 +949,13 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <li>空间局部性</li>
 </ul>
 
-<h2 id="toc_6">中断和时钟</h2>
+<h2 id="toc_7">中断和时钟</h2>
 
-<h3 id="toc_7">中断和异常</h3>
+<h3 id="toc_8">中断和异常</h3>
 
 <ul>
-<li>中断的基本概念<code>中断是指计算机运行过程中，出现某些意外情况需主机干预时，机器能自动暂停正在运行的程序并转入处理新情况的程序，处理完毕后又返回原被暂停的程序继续运行</code> <code>程序运行过程中，如果系统外部、系统内部或者当前运行程序本身出现紧急事件，处理机将立即暂停当前程序的运行，自动转入相应的处理程序（中断服务程序），待处理完毕完后，再返回原来的程序运行，这整个过程成为程序中断</code></li>
-<li>现代计算机中采用中断系统的主要目的
+<li><p>中断的基本概念<code>中断是指计算机运行过程中，出现某些意外情况需主机干预时，机器能自动暂停正在运行的程序并转入处理新情况的程序，处理完毕后又返回原被暂停的程序继续运行</code> <code>程序运行过程中，如果系统外部、系统内部或者当前运行程序本身出现紧急事件，处理机将立即暂停当前程序的运行，自动转入相应的处理程序（中断服务程序），待处理完毕完后，再返回原来的程序运行，这整个过程成为程序中断</code></p></li>
+<li><p>现代计算机中采用中断系统的主要目的</p>
 
 <ul>
 <li>提高计算机系统效率</li>
@@ -955,7 +963,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <li>满足实时处理要求</li>
 <li>提供故障现场处理手段</li>
 </ul></li>
-<li>中断的分类
+<li><p>中断的分类</p>
 
 <ul>
 <li>中断</li>
@@ -972,19 +980,20 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <li>编程异常</li>
 </ul></li>
 </ul></li>
-<li>中断向量</li>
-<li>中断描述符表
+<li><p>中断向量</p></li>
+<li><p>中断描述符表</p>
 
 <ul>
 <li>中断门</li>
 <li>陷阱门</li>
 <li>系统门</li>
 </ul></li>
-<li>传统的中断控制器：8259A
-### 计算机系统时钟</li>
-<li>实时时钟 RTC</li>
-<li>时间戳计数器 TSC</li>
-<li>可编程间隔定时器 PIT</li>
+<li><p>传统的中断控制器：8259A</p>
+
+<h3 id="toc_9">计算机系统时钟</h3></li>
+<li><p>实时时钟 RTC</p></li>
+<li><p>时间戳计数器 TSC</p></li>
+<li><p>可编程间隔定时器 PIT</p></li>
 </ul>
 <br /><br /><br /><br /><br />
 </div><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
