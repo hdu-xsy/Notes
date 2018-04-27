@@ -1,13 +1,14 @@
 - Makefile
 ```
-obj-m:=family.o
-OS22-objs:=family.o
+obj-m:=OS-2-2.o
+OS22-objs:=OS-2-2.o
 KDIR:=/home/kannaduki/linux/linux-4.15.15
 PWD:= $(shell pwd)
 default:
 	make -C $(KDIR) M=$(PWD) modules
 clean:
 	make -C $(KDIR) M=$(PWD) clean
+
 ```
 
 - family.c
@@ -26,7 +27,7 @@ static int family_init(void)
 {
 	struct task_struct *p;
 	struct list_head *pp;
-	struct task_struct *psibling;
+	struct task_struct *pl;
         if(pid == 0) {
                 printk("输入错误\n");
 		return 0;
@@ -46,20 +47,20 @@ static int family_init(void)
 	}
         else
 	{
-		printk("Parent : %d %s\n",p->parent->pid,p->parent->comm);
+		printk("pid: %d 程序名:%s 进程状态: %ld\n",p->parent->pid,p->parent->comm,p->parent->state);
 	}
 	printk("------兄弟进程-------\n");
 	list_for_each(pp,&p->parent->children)
 	{
-		psibling=list_entry(pp,struct task_struct,sibling);
-		printk("Sibling: %d %s \n",psibling->pid,psibling->comm);
+		pl=list_entry(pp,struct task_struct,sibling);
+		printk("pid: %d 程序名: %s 进程状态: %ld\n",pl->pid,pl->comm,pl->state);
 	}
 	printk("---------子进程--------\n");
 	if(&p->children==NULL) printk("子进程不存在");
 	list_for_each(pp,&p->children)
 	{
-		psibling=list_entry(pp,struct task_struct,sibling);
-		printk("Children: %d %s \n",psibling->pid,psibling->comm);
+		pl=list_entry(pp,struct task_struct,sibling);
+		printk("pid: %d 程序名: %s 进程状态: %ld\n",pl->pid,pl->comm,pl->state);
 	}
 	printk("-----------------------\n\n\n\n\n\n");
         return 0;
@@ -72,6 +73,5 @@ static void family_exit(void)
 module_init(family_init);
 module_exit(family_exit);
 MODULE_LICENSE("GPL");
-
 
 ```
