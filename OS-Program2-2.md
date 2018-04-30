@@ -17,6 +17,7 @@ clean:
 #include<linux/module.h>
 #include<linux/kernel.h>
 #include<linux/pid.h>
+// 内核版本为3.X 则为<linux/sched.h>
 #include <linux/sched/signal.h>
 #include <linux/moduleparam.h>
 

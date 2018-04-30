@@ -1,3 +1,5 @@
+> Makefile 和 OS-2-1.c在同一文件夹内即可
+
 - Makefile
 ```
 obj-m:=OS-2-1.o
@@ -16,6 +18,7 @@ clean:
 #include<linux/init.h>
 #include<linux/module.h>
 #include<linux/kernel.h>
+// 内核版本为3.X 则为<linux/sched.h>
 #include<linux/sched/signal.h>
 static int hello_init(void)
 {
