@@ -1,0 +1,1064 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width; initial-scale=1.0; " name="viewport" /><title>Document</title>
+<style>
+@font-face {
+  font-family: octicons-anchor;
+  src: url(data:font/woff;charset=utf-8;base64,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) format('woff');
+}
+
+body {
+  background-color: white;
+}
+
+.markdown-body {
+  min-width: 200px;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px;
+
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  color: #333;
+  overflow: hidden;
+  font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+.markdown-body a {
+  background: transparent;;word-wrap: break-word; word-break: break-all;
+}
+
+.markdown-body a:active,
+.markdown-body a:hover {
+  outline: 0;
+}
+
+.markdown-body strong {
+  font-weight: bold;
+}
+
+.markdown-body h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+.markdown-body img {
+  border: 0;
+}
+
+.markdown-body hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+
+.markdown-body pre {
+  overflow: auto;
+}
+
+.markdown-body code,
+.markdown-body kbd,
+.markdown-body pre {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+.markdown-body input {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+
+.markdown-body html input[disabled] {
+  cursor: default;
+}
+
+.markdown-body input {
+  line-height: normal;
+}
+
+.markdown-body input[type="checkbox"] {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.markdown-body td,
+.markdown-body th {
+  padding: 0;
+}
+
+.markdown-body * {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.markdown-body input {
+  font: 13px/1.4 Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.markdown-body a {
+  color: #4183c4;
+  text-decoration: none;
+}
+
+.markdown-body a:hover,
+.markdown-body a:focus,
+.markdown-body a:active {
+  text-decoration: underline;
+}
+
+.markdown-body hr {
+  height: 0;
+  margin: 15px 0;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.markdown-body hr:before {
+  display: table;
+  content: "";
+}
+
+.markdown-body hr:after {
+  display: table;
+  clear: both;
+  content: "";
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  line-height: 1.1;
+}
+
+.markdown-body h1 {
+  font-size: 30px;
+}
+
+.markdown-body h2 {
+  font-size: 21px;
+}
+
+.markdown-body h3 {
+  font-size: 16px;
+}
+
+.markdown-body h4 {
+  font-size: 14px;
+}
+
+.markdown-body h5 {
+  font-size: 12px;
+}
+
+.markdown-body h6 {
+  font-size: 11px;
+}
+
+.markdown-body blockquote {
+  margin: 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body ol ol,
+.markdown-body ul ol {
+  list-style-type: lower-roman;
+}
+
+.markdown-body ul ul ol,
+.markdown-body ul ol ol,
+.markdown-body ol ul ol,
+.markdown-body ol ol ol {
+  list-style-type: lower-alpha;
+}
+
+.markdown-body dd {
+  margin-left: 0;
+}
+
+.markdown-body code {
+  font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.markdown-body pre {
+  margin-top: 0;
+  margin-bottom: 0;
+  font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.markdown-body kbd {
+  background-color: #e7e7e7;
+  background-image: -webkit-linear-gradient(#fefefe, #e7e7e7);
+  background-image: linear-gradient(#fefefe, #e7e7e7);
+  background-repeat: repeat-x;
+  border-radius: 2px;
+  border: 1px solid #cfcfcf;
+  color: #000;
+  padding: 3px 5px;
+  line-height: 10px;
+  font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  display: inline-block;
+}
+
+.markdown-body>*:first-child {
+  margin-top: 0 !important;
+}
+
+.markdown-body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+.markdown-body .anchor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  padding-right: 6px;
+  padding-left: 30px;
+  margin-left: -30px;
+}
+
+.markdown-body .anchor:focus {
+  outline: none;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  position: relative;
+  margin-top: 1em;
+  margin-bottom: 16px;
+  font-weight: bold;
+  line-height: 1.4;
+}
+
+.markdown-body h1 .octicon-link,
+.markdown-body h2 .octicon-link,
+.markdown-body h3 .octicon-link,
+.markdown-body h4 .octicon-link,
+.markdown-body h5 .octicon-link,
+.markdown-body h6 .octicon-link {
+  display: none;
+  color: #000;
+  vertical-align: middle;
+}
+
+.markdown-body h1:hover .anchor,
+.markdown-body h2:hover .anchor,
+.markdown-body h3:hover .anchor,
+.markdown-body h4:hover .anchor,
+.markdown-body h5:hover .anchor,
+.markdown-body h6:hover .anchor {
+  height: 1em;
+  padding-left: 8px;
+  margin-left: -30px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.markdown-body h1:hover .anchor .octicon-link,
+.markdown-body h2:hover .anchor .octicon-link,
+.markdown-body h3:hover .anchor .octicon-link,
+.markdown-body h4:hover .anchor .octicon-link,
+.markdown-body h5:hover .anchor .octicon-link,
+.markdown-body h6:hover .anchor .octicon-link {
+  display: inline-block;
+}
+
+.markdown-body h1 {
+  padding-bottom: 0.3em;
+  font-size: 2.25em;
+  line-height: 1.2;
+  border-bottom: 1px solid #eee;
+}
+
+.markdown-body h2 {
+  padding-bottom: 0.3em;
+  font-size: 1.75em;
+  line-height: 1.225;
+  border-bottom: 1px solid #eee;
+}
+
+.markdown-body h3 {
+  font-size: 1.5em;
+  line-height: 1.43;
+}
+
+.markdown-body h4 {
+  font-size: 1.25em;
+}
+
+.markdown-body h5 {
+  font-size: 1em;
+}
+
+.markdown-body h6 {
+  font-size: 1em;
+  color: #777;
+}
+
+.markdown-body p,
+.markdown-body blockquote,
+.markdown-body ul,
+.markdown-body ol,
+.markdown-body dl,
+.markdown-body table,
+.markdown-body pre {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.markdown-body hr {
+  height: 4px;
+  padding: 0;
+  margin: 16px 0;
+  background-color: #e7e7e7;
+  border: 0 none;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 2em;
+}
+
+.markdown-body ul ul,
+.markdown-body ul ol,
+.markdown-body ol ol,
+.markdown-body ol ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body li>p {
+  margin-top: 16px;
+}
+
+.markdown-body dl {
+  padding: 0;
+}
+
+.markdown-body dl dt {
+  padding: 0;
+  margin-top: 16px;
+  font-size: 1em;
+  font-style: italic;
+  font-weight: bold;
+}
+
+.markdown-body dl dd {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.markdown-body blockquote {
+  padding: 0 15px;
+  color: #777;
+  border-left: 4px solid #ddd;
+}
+
+.markdown-body blockquote>:first-child {
+  margin-top: 0;
+}
+
+.markdown-body blockquote>:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body table {
+  display: block;
+  width: 100%;
+  overflow: auto;
+  word-break: normal;
+  word-break: keep-all;
+}
+
+.markdown-body table th {
+  font-weight: bold;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+  padding: 6px 13px;
+  border: 1px solid #ddd;
+}
+
+.markdown-body table tr {
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+}
+
+.markdown-body table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.markdown-body code {
+  padding: 0;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(0,0,0,0.04);
+  border-radius: 3px;
+}
+
+.markdown-body code:before,
+.markdown-body code:after {
+  letter-spacing: -0.2em;
+  content: "\00a0";
+}
+
+.markdown-body pre>code {
+  padding: 0;
+  margin: 0;
+  font-size: 100%;
+  word-break: normal;
+  white-space: pre;
+  background: transparent;
+  border: 0;
+}
+
+.markdown-body .highlight {
+  margin-bottom: 16px;
+}
+
+.markdown-body .highlight pre,
+.markdown-body pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f7f7f7;
+  border-radius: 3px;
+}
+
+.markdown-body .highlight pre {
+  margin-bottom: 0;
+  word-break: normal;
+}
+
+.markdown-body pre {
+  word-wrap: normal;
+}
+
+.markdown-body pre code {
+  display: inline;
+  max-width: initial;
+  padding: 0;
+  margin: 0;
+  overflow: initial;
+  line-height: inherit;
+  word-wrap: normal;
+  background-color: transparent;
+  border: 0;
+}
+
+.markdown-body pre code:before,
+.markdown-body pre code:after {
+  content: normal;
+}
+
+.markdown-body .highlight {
+  background: #fff;
+}
+
+.markdown-body .highlight .mf,
+.markdown-body .highlight .mh,
+.markdown-body .highlight .mi,
+.markdown-body .highlight .mo,
+.markdown-body .highlight .il,
+.markdown-body .highlight .m {
+  color: #945277;
+}
+
+.markdown-body .highlight .s,
+.markdown-body .highlight .sb,
+.markdown-body .highlight .sc,
+.markdown-body .highlight .sd,
+.markdown-body .highlight .s2,
+.markdown-body .highlight .se,
+.markdown-body .highlight .sh,
+.markdown-body .highlight .si,
+.markdown-body .highlight .sx,
+.markdown-body .highlight .s1 {
+  color: #df5000;
+}
+
+.markdown-body .highlight .kc,
+.markdown-body .highlight .kd,
+.markdown-body .highlight .kn,
+.markdown-body .highlight .kp,
+.markdown-body .highlight .kr,
+.markdown-body .highlight .kt,
+.markdown-body .highlight .k,
+.markdown-body .highlight .o {
+  font-weight: bold;
+}
+
+.markdown-body .highlight .kt {
+  color: #458;
+}
+
+.markdown-body .highlight .c,
+.markdown-body .highlight .cm,
+.markdown-body .highlight .c1 {
+  color: #998;
+  font-style: italic;
+}
+
+.markdown-body .highlight .cp,
+.markdown-body .highlight .cs {
+  color: #999;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .cs {
+  font-style: italic;
+}
+
+.markdown-body .highlight .n {
+  color: #333;
+}
+
+.markdown-body .highlight .na,
+.markdown-body .highlight .nv,
+.markdown-body .highlight .vc,
+.markdown-body .highlight .vg,
+.markdown-body .highlight .vi {
+  color: #008080;
+}
+
+.markdown-body .highlight .nb {
+  color: #0086B3;
+}
+
+.markdown-body .highlight .nc {
+  color: #458;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .no {
+  color: #094e99;
+}
+
+.markdown-body .highlight .ni {
+  color: #800080;
+}
+
+.markdown-body .highlight .ne {
+  color: #990000;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .nf {
+  color: #945277;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .nn {
+  color: #555;
+}
+
+.markdown-body .highlight .nt {
+  color: #000080;
+}
+
+.markdown-body .highlight .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+}
+
+.markdown-body .highlight .gd {
+  color: #000;
+  background-color: #fdd;
+}
+
+.markdown-body .highlight .gd .x {
+  color: #000;
+  background-color: #faa;
+}
+
+.markdown-body .highlight .ge {
+  font-style: italic;
+}
+
+.markdown-body .highlight .gr {
+  color: #aa0000;
+}
+
+.markdown-body .highlight .gh {
+  color: #999;
+}
+
+.markdown-body .highlight .gi {
+  color: #000;
+  background-color: #dfd;
+}
+
+.markdown-body .highlight .gi .x {
+  color: #000;
+  background-color: #afa;
+}
+
+.markdown-body .highlight .go {
+  color: #888;
+}
+
+.markdown-body .highlight .gp {
+  color: #555;
+}
+
+.markdown-body .highlight .gs {
+  font-weight: bold;
+}
+
+.markdown-body .highlight .gu {
+  color: #800080;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .gt {
+  color: #aa0000;
+}
+
+.markdown-body .highlight .ow {
+  font-weight: bold;
+}
+
+.markdown-body .highlight .w {
+  color: #bbb;
+}
+
+.markdown-body .highlight .sr {
+  color: #017936;
+}
+
+.markdown-body .highlight .ss {
+  color: #8b467f;
+}
+
+.markdown-body .highlight .bp {
+  color: #999;
+}
+
+.markdown-body .highlight .gc {
+  color: #999;
+  background-color: #EAF2F5;
+}
+
+.markdown-body .octicon {
+  font: normal normal 16px octicons-anchor;
+  line-height: 1;
+  display: inline-block;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.markdown-body .octicon-link:before {
+  content: '\f05c';
+}
+
+.markdown-body .task-list-item {
+  list-style-type: none;
+}
+
+.markdown-body .task-list-item+.task-list-item {
+  margin-top: 3px;
+}
+
+.markdown-body .task-list-item input {
+  float: left;
+  margin: 0.3em 0 0.25em -1.6em;
+  vertical-align: middle;
+}
+
+/*
+
+github.com style (c) Vasily Polovnyov <vast@whiteants.net>
+
+*/
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #333;
+  background: #f8f8f8;
+  -webkit-text-size-adjust: none;
+}
+
+.hljs-comment,
+.diff .hljs-header {
+  color: #998;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.css .rule .hljs-keyword,
+.hljs-winutils,
+.nginx .hljs-title,
+.hljs-subst,
+.hljs-request,
+.hljs-status {
+  color: #333;
+  font-weight: bold;
+}
+
+.hljs-number,
+.hljs-hexcolor,
+.ruby .hljs-constant {
+  color: #008080;
+}
+
+.hljs-string,
+.hljs-tag .hljs-value,
+.hljs-doctag,
+.tex .hljs-formula {
+  color: #d14;
+}
+
+.hljs-title,
+.hljs-id,
+.scss .hljs-preprocessor {
+  color: #900;
+  font-weight: bold;
+}
+
+.hljs-list .hljs-keyword,
+.hljs-subst {
+  font-weight: normal;
+}
+
+.hljs-class .hljs-title,
+.hljs-type,
+.vhdl .hljs-literal,
+.tex .hljs-command {
+  color: #458;
+  font-weight: bold;
+}
+
+.hljs-tag,
+.hljs-tag .hljs-title,
+.hljs-rule .hljs-property,
+.django .hljs-tag .hljs-keyword {
+  color: #000080;
+  font-weight: normal;
+}
+
+.hljs-attribute,
+.hljs-variable,
+.lisp .hljs-body,
+.hljs-name {
+  color: #008080;
+}
+
+.hljs-regexp {
+  color: #009926;
+}
+
+.hljs-symbol,
+.ruby .hljs-symbol .hljs-string,
+.lisp .hljs-keyword,
+.clojure .hljs-keyword,
+.scheme .hljs-keyword,
+.tex .hljs-special,
+.hljs-prompt {
+  color: #990073;
+}
+
+.hljs-built_in {
+  color: #0086b3;
+}
+
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-pi,
+.hljs-doctype,
+.hljs-shebang,
+.hljs-cdata {
+  color: #999;
+  font-weight: bold;
+}
+
+.hljs-deletion {
+  background: #fdd;
+}
+
+.hljs-addition {
+  background: #dfd;
+}
+
+.diff .hljs-change {
+  background: #0086b3;
+}
+
+.hljs-chunk {
+  color: #aaa;
+}
+
+
+</style>
+
+<style> @media print{ .hljs{overflow: visible; word-wrap: break-word !important;} }</style></head><body><div class="markdown-body yue">
+<h1 id="toc_0">文件系统</h1>
+
+<h2 id="toc_1">文件和文件系统</h2>
+
+<h3 id="toc_2">文件</h3>
+
+<ul>
+<li>文件的概念 <code>概念上来讲，文件是具有符号名的、在逻辑上有完整意义的一组相关信息项的有序集合</code></li>
+<li>文件的类型
+
+<ul>
+<li>文件用途：系统文件、库文件、用户文件</li>
+<li>文件保护级别：只读文件、读写文件、只执行文件、和不保护文件</li>
+<li>文件存取方式：顺序存取文件、随机存取文件</li>
+<li>实际操作系统中的文件分类</li>
+</ul></li>
+</ul>
+
+<h3 id="toc_3">文件系统</h3>
+
+<ul>
+<li>文件存储空间的管理</li>
+<li>文件目录管理</li>
+<li>文件逻辑地址到物理地址映射机制</li>
+<li>文件读写管理</li>
+<li>文件共享和保护</li>
+</ul>
+
+<h3 id="toc_4">文件操作</h3>
+
+<ul>
+<li>创建文件</li>
+<li>删除文件</li>
+<li>打开文件</li>
+<li>关闭文件</li>
+<li>读文件</li>
+<li>写文件</li>
+<li>设置文件读写指针</li>
+<li>获取文件属性</li>
+<li>设置文件属性</li>
+<li>重命名文件</li>
+<li>锁定文件</li>
+</ul>
+
+<h2 id="toc_5">文件的结构和存取</h2>
+
+<h3 id="toc_6">文件的逻辑结构</h3>
+
+<p><code>从用户观点出发观察到的文件结构</code></p>
+
+<ul>
+<li>有结构文件 <code>有结构文件由若干条记录构成。记录是用户程序与文件系统交换信息的基本单位。其数据组织形式分为三级：数据项、记录和文件</code>
+
+<ul>
+<li>顺序文件 <code>串结构：记录之间的顺序与关键字无关，通常是按照记录存入时间的先后排序，每次检索都需要从头开始逐个查找，检索比较耗时 顺序结构：按照关键词排序，可以利用有效的查找算法，检索速度和效率相对较高 顺序文件优点是顺序存取时效率高，缺点是不利于文件的查找，动态增加或者删除文件记录</code></li>
+<li>索引文件 <code>为逻辑文件的信息建立一个索引表，索引表的表项存放文件记录的长度和逻辑文件的起始位置 索引文件的优点是可以随机访问，也有利于文件的增加和删除，但是索引表的使用增加了空间开始，索引表的查找策略对文件系统的效率影响很大</code></li>
+<li>索引顺序文件 <code>顺序文件中的所有记录分成若干组,为顺序文件建立一张索引表,并为每组中的第一个记录在索引表建立一个索引项,期中包含该记录的关键字和指向该记录的指针 大大提高了顺序存取的速度,但增加了存储开销</code></li>
+<li>直接文件和散列文件 <code>直接文件是建立关键字和相应记录物理地址之间的对应关系，这样通过关键字可以直接找到记录的物理地址 散列文件是一种典型和最为广泛的直接文件，转换结果直接决定记录的物理地址，存取速度高，但可能使不同关键字得到相同函数值而发生冲突</code></li>
+</ul></li>
+<li>无结构文件 <code>内部不再划分记录，而是由一组相关信息组成的有序字符流，长度按字节计算，提高了操作系统的灵活性，减少了操作系统的代码量</code></li>
+</ul>
+
+<h3 id="toc_7">文件的物理结构</h3>
+
+<p><code>物理块(簇)是磁盘上一组连续扇区(512字节)，它是分配和传输信息的基本单位</code></p>
+
+<pre><code>簇数=分区大小/盘块大小
+FAT表大小=簇数*盘块号大小
+</code></pre>
+
+<ul>
+<li>连续文件 <code>把逻辑文件的信息顺序地存放到一组相邻接的物理盘块中而形成的物理文件</code> <code>顺序存取速度快，也能方便地实现文件的随机存取，但磁盘利用率不高，不方便文件的动态增长，容易产生磁盘碎片，降低磁盘存储空间的利用率</code></li>
+<li>链接文件 <code>把一个逻辑上连续的文件分散存放在多个不连续的磁盘块中，再使用链接指针将这多个离散的磁盘块链接起来</code>
+
+<ul>
+<li>隐式链接 <code>文件所占据的每个磁盘块的最后一个单元中，设置一个链接指针，用于指示该文件的下一个磁盘块的盘块号，文件最后一个磁盘块中的链接指针存放文件结束标志，然后把文件名、第一个磁盘块号、最后一个磁盘块号填入该文件目录项中即可</code> <code>只能对文件进行顺序存取、如果文件中某个磁盘块出现故障，将导致后续盘块指针丢失，但增大了磁盘空间的内部碎片</code></li>
+<li>显式链接 <code>把链接文件各磁盘块的链接指针显式地存放在外存的一张链接表中</code> <code>显著提高了文件的检索速度，能实现随机存取，FAT会占据较大的内存空间，FAT较大时，随机存取的效率会降低</code></li>
+</ul></li>
+<li>索引文件
+
+<ul>
+<li>单级索引文件 <code>逻辑上连续的文件仍然可以分散存放在多个不连续的磁盘块中，系统为每个文件建立一张索引表，每个逻辑块占一个表项，以逻辑块号为序，表项内容为该逻辑块所对应的磁盘块号</code> <code>支持高效的随机访问，不会产生外部碎片，也支持文件的动态增长，每个文件都需要额外分配索引块，增加了系统存储空间的开销</code></li>
+<li>多级索引文件 <code>将索引表离散存放在多个索引块中，再为这些索引块建立一级索引，即再分配一个索引块用于存放索引块的盘块号</code></li>
+<li>混合索引文件 <code>多种索引分配方式相结合形成的一种文件</code></li>
+</ul></li>
+</ul>
+
+<h3 id="toc_8">文件存取</h3>
+
+<ul>
+<li>顺序存取</li>
+<li>随机存取</li>
+</ul>
+
+<h2 id="toc_9">文件目录管理</h2>
+
+<ul>
+<li>实现按名存取</li>
+<li>提高目录的检索速度</li>
+<li>允许文件重名</li>
+<li>允许文件共享</li>
+</ul>
+
+<h3 id="toc_10">文件目录概念</h3>
+
+<ul>
+<li>文件控制块 <code>文件控制块是用于描述和控制文件的数据结构，保存系统管理文件所需要的全部属性信息</code>
+
+<ul>
+<li>基本信息 <code>文件名、用户名、文件类型、文件的物理地址、文件长度、文件的逻辑结构和物理结构</code></li>
+<li>存取控制信息 <code>描述文件的存取权限，包括文件主、文件主同组用户、一般用户的对该文件存取权限</code></li>
+<li>使用信息 <code>文件的建立日期及时间、上次存取文件的日期及时间、当前的使用状态信息以及共享链接计数等</code></li>
+</ul></li>
+<li>索引节点
+
+<ul>
+<li>索引节点的引入 <code>采用将文件控制块中的文件名与其他描述信息分开的方法，将文件名以外的描述信息单独形成一个数据结构，称为索引节点</code></li>
+<li>索引节点分类</li>
+<li>磁盘索引节点</li>
+<li>内存索引节点</li>
+</ul></li>
+</ul>
+
+<h3 id="toc_11">文件目录结构</h3>
+
+<ul>
+<li>单级目录结构 <code>整个文件系统中只建立一张线性目录表，每个文件的目录项占一个表项，其中记录了文件名、文件长度、文件类型、存取控制信息、物理地址以及其他文件描述信息</code> <code>查找速度慢、不允许文件重名、不便于实现文件共享</code></li>
+<li>两级目录结构 <code>将文件目录分为主文件目录和用户文件目录，系统为每个用户建立一个单独的用户文件目录UFD</code> <code>提高了目录检索速度、允许文件重名、不同用户可以使用不同文件名来访问系统中的同一个共享文件、缺乏灵活性</code></li>
+<li>多级目录结构 <code>在树形目录结构中，主目录再称为根目录，目录树中的非叶结点均为目录文件，叶节点为数据文件</code> <code>层次清楚、解决了文件重名问题、便于实现文件共享、查询速度更快</code>
+### 目录检索技术</li>
+<li>线性检索法</li>
+<li>Hash方法</li>
+</ul>
+
+<h2 id="toc_12">文件存储空间管理</h2>
+
+<ul>
+<li>空闲表法 <code>空闲表法是文件系统为外存上的所有空闲分区建立一张空闲表，每个空闲区占一个表项，包括序号、该空闲区的起始盘号以及空闲盘块数等信息，再将所有空闲区按其起始盘号递增的次序排列</code></li>
+<li>空闲块链表法 <code>给磁盘的每一个空闲盘块设置一个指针，指向另一个空闲盘块，这样磁盘上的所有空闲链接在一起形成一个链表</code></li>
+<li>位示图 <code>用一位二进制来表示磁盘中一个盘块的使用情况</code></li>
+<li>成组链接法 <code>先把所有空闲块按照固定数量分成若干组，把每组(第一组除外)的磁盘总块数和该组的所有磁盘块号记录到前一组的最末磁盘块中，第一组的磁盘块总块数和各磁盘块号记录在空闲盘块栈中，放到超级块里</code></li>
+</ul>
+
+<h2 id="toc_13">文件共享和文件保护</h2>
+
+<h3 id="toc_14">文件共享</h3>
+
+<ul>
+<li><p>基于索引节点的共享方式 <code>当某一个用户需要共享文件时，可在自己的文件目录中建立一个目录项，填入为共享文件所取的名字以及指向该共享文件索引节点的指针（硬链接）</code> <code>开销不大，缺点是当有多个用户共享文件时，文件主不能删除文件，不能实现跨文件卷的文件共享</code></p></li>
+<li><p>利用符号链接实现文件共享 <code>创建一个称为符号链接的新文件（软链接）</code></p></li>
+</ul>
+
+<h3 id="toc_15">文件保护</h3>
+
+<ul>
+<li>文件备份
+
+<ul>
+<li>批量备份
+
+<ul>
+<li>全量转储</li>
+<li>增量转储</li>
+</ul></li>
+<li>同步备份</li>
+</ul></li>
+<li>文件访问保护
+
+<ul>
+<li>口令保护</li>
+<li>加密保护</li>
+<li>设置文件使用权限
+
+<ul>
+<li>访问控制矩阵</li>
+<li>访问控制表</li>
+<li>用户权限表</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2 id="toc_16">磁盘调度</h2>
+
+<h3 id="toc_17">磁盘存储器管理</h3>
+
+<ul>
+<li>数据的组织和格式 <code>磁盘容量=磁头数*柱面数*扇区数*每扇区字节数</code></li>
+<li>磁盘的类型
+
+<ul>
+<li>固定头磁盘</li>
+<li>移动头磁盘</li>
+</ul></li>
+<li>磁盘访问时间
+
+<ul>
+<li>寻道时间=启动磁臂的时间+磁道数*移动一条磁道所需要的时间</li>
+<li>旋转延迟时间=(1/旋转速度)/2</li>
+<li>传输时间=(每次读写的字节数)/(旋转速度*一个磁道上的字节数)</li>
+</ul></li>
+</ul>
+
+<h3 id="toc_18">磁盘调度算法</h3>
+
+<ul>
+<li>移臂调度
+
+<ul>
+<li>先来先服务FCFS算法 <code>按照进程请求访问磁盘的先后次序进行调度</code></li>
+<li>最短寻道时间优先SSTF算法 <code>总是从等待访问者中挑选寻找时间最短(即与当前刺头位置最近)的那个请求执行的</code></li>
+<li>扫描SCAN算法 <code>从磁头当前移动向上，选择与当前磁头所在磁道距离最近的柱面访问者，如果沿臂的移动方向无请求访问时，就改变磁头的反方向再选择</code></li>
+<li>循环扫描CSAN算法 <code>固定磁头单向移动，当磁头移动到最外磁道时立即返回到最里面的磁道，循环扫描</code></li>
+<li>N-Step-SCAN算法 <code>将磁盘请求队列分成若干个长度为N的子队列，磁盘调度将按FCFS算法依次处理这些子队列，而每处理一个子队列时又采用SCAN算法</code></li>
+<li>FSCAN(Fair SCAN)算法 <code>只将磁盘请求队列分成两个子队列</code></li>
+</ul></li>
+<li>旋转调度 <code>总是选取与当前读写头最近的那个I/O请求</code></li>
+</ul>
+
+<h2 id="toc_19">Linux文件系统</h2>
+<br /><br /><br /><br /><br />
+</div><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+</body>
+
+</html>
