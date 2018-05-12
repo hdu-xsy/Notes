@@ -840,326 +840,161 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <style> @media print{ .hljs{overflow: visible; word-wrap: break-word !important;} }</style></head><body><div class="markdown-body yue">
 <h1 id="toc_0">操作系统 课程设计</h1>
 
-<h2 id="toc_1">简单文件系统的实现</h2>
+<h2 id="toc_1">Linux内核编译及添加系统调用</h2>
 
-<h3 id="toc_2">结构</h3>
-
-<h3 id="toc_3">函数</h3>
-
-<h2 id="toc_4">Linux进程管理</h2>
-
-<h3 id="toc_5">4.共享内存、有名信号量</h3>
+<blockquote>
+<p>先安装ccache可以大幅节省多次内核编译时间</p>
+</blockquote>
 
 <ul>
-<li>sender.c</li>
+<li>进入内核目录</li>
+<li>分配系统调用号,修改系统调用表</li>
 </ul>
 
-<pre><code>#include &lt;unistd.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;semaphore.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;sys/ipc.h&gt;
-#include &lt;sys/msg.h&gt;
-#include &lt;sys/shm.h&gt;
-#include &lt;fcntl.h&gt;
+<pre><code>vim ./arch/x86/entry/syscalls/syscall_64.tbl
 
-struct shm_msg {
-    pid_t pid;
-    char msg[100];
-};
-
-int main() {
-    sem_t *sem;
-    int shmid;
-    char msg[100];
-    struct shm_msg *shmaddr;
-    sem = sem_open(&quot;mysem&quot;,O_CREAT,0644,1);
-    shmid = shmget(ftok(&quot;.&quot;,1),1024,IPC_CREAT);
-    shmaddr = shmat(shmid,0,0);
-    shmaddr-&gt;pid = -1;
-    printf(&quot;请输入字符串\n&quot;);
-    scanf(&quot;%s&quot;,msg);
-    sem_wait(sem);
-    shmaddr-&gt;pid = 1;
-    strcpy(shmaddr-&gt;msg,msg);
-    printf(&quot;sender 发送 %s\n&quot;,shmaddr-&gt;msg);
-    sem_post(sem);
-    while(1) {
-        if(shmaddr-&gt;pid == 0){
-            sem_wait(sem);
-            printf(&quot;sender 接收 %s&quot;,shmaddr-&gt;msg);
-            break;
-        }
-    }
-    sem_post(sem);
-    sem_close(sem);
-    sem_unlink(&quot;mysem&quot;);
-    return 0;  
-}   
-
+尾部添加 ([549]为最后一个系统调用号+1)
+549     64      mysetnice               sys_mysetnice
 </code></pre>
 
 <ul>
-<li>receiver.c </li>
+<li>申明系统调用服务例程原型</li>
 </ul>
 
-<pre><code>#include &lt;unistd.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;semaphore.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;sys/ipc.h&gt;
-#include &lt;sys/msg.h&gt;
-#include &lt;sys/shm.h&gt;
-#include &lt;fcntl.h&gt;
+<pre><code>vim ./include/linux/syscalls.h
 
-struct shm_msg {
-    pid_t pid;
-    char msg[100];
-};
+asmlinkage long sys_mysetnice(pid_t pid,int flag,int nicevalue); //,void __user* prio,void __user* nice);
+</code></pre>
 
-int main()  
+<ul>
+<li>实现系统调用服务例程 </li>
+</ul>
+
+<pre><code>vim ./kernel/sys.c
+
+SYSCALL_DEFINE3(mysetnice, pid_t, pid, int, flag, int, nicevalue)
 {
-    sem_t *sem;
-    int shmid;
-    char msg[100];
-    struct shm_msg *shmaddr;
-    sem = sem_open(&quot;mysem&quot;,O_CREAT,0644,1);
-    shmid = shmget(ftok(&quot;.&quot;,1),1024,IPC_CREAT);
-    shmaddr = shmat(shmid,0,0);
-    while(1) {
-        if(shmaddr-&gt;pid == 1){
-            sem_wait(sem);
-            printf(&quot;receiver 接收 %s\n&quot;,shmaddr-&gt;msg);
-            strcpy(shmaddr-&gt;msg,&quot;over&quot;);
-            printf(&quot;receiver 发送 %s \n&quot;,shmaddr-&gt;msg);
-            shmaddr-&gt;pid = 0;
-            break;
-        }
+    struct pid * kpid;
+    struct task_struct * task;
+    int nicebef;
+    kpid = find_get_pid(pid);/* 返回pid */
+    task = pid_task(kpid, PIDTYPE_PID);/* 返回task_struct */
+    nicebef = task_nice(task);/* 返回进程当前nice值 */
+    if(flag == 1)
+    {
+        set_user_nice(task, nicevalue);/* 修改进程nice值 */
+        printk(&quot;修改前nice值：%d\t修改后nice值：%d\n&quot;, nicebef, nicevalue);
+        return 0;
     }
-    sem_post(sem);
-    sem_close(sem);
-      return 0;  
-}  
-
-</code></pre>
-
-<h3 id="toc_6">3. 消息队列、无名信号量</h3>
-
-<pre><code>#include &lt;unistd.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;semaphore.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;sys/ipc.h&gt;
-#include &lt;sys/msg.h&gt;
-
-//  gcc OS-3-3.c -o OS-3-3 -pthread
-//  ./OS-3-3
-//  第三个题和第四个题跑多了好像ftok的key_t会混起来 接收不到信息 改一下或者重启一下就行了
-
-sem_t sem;
-int sval;
-
-void sender() {
-    sem_wait(&amp;sem);
-    key_t key;
-    int msqid,msnd;
-    char msgp[100] = {0};
-    key = ftok(&quot;.&quot;,1);
-    msqid = msgget(key,IPC_CREAT);
-    while(1) {
-        printf(&quot;请输入消息\n&quot;);
-        scanf(&quot;%s&quot;,msgp);
-        if(strcmp(msgp,&quot;exit&quot;)==0){
-            strcpy(msgp,&quot;end&quot;);
-            msnd = msgsnd(msqid,msgp,strlen(msgp),MSG_NOERROR);
-            printf(&quot;--------------------------------\n&quot;);
-            printf(&quot;发送%d个字符(end),应答信息如下\n&quot;,strlen(msgp));
-            break;
-        }else{
-            msnd = msgsnd(msqid,msgp,strlen(msgp),MSG_NOERROR);
-            printf(&quot;发送%d个字符,输入exit应答\n&quot;,strlen(msgp));
-        }
+    else if(flag == 0)
+    {
+        printk(&quot;该进程的nice值为%d\n&quot;, nicebef);
+        return 0;
     }
-    //msnd = msgsnd(msqid,msgp,strlen(msgp),MSG_NOERROR);
-    //printf(&quot;sender key_t: %d IPC:%d \n&quot;,key,msqid);
-    sem_post(&amp;sem);
-    usleep(100);
-    sem_wait(&amp;sem);
-    msgrcv(msqid,msgp,100,0,0);
-    printf(&quot;sender 接收 %s\n&quot;,msgp);
-    sem_post(&amp;sem);
-} 
-void receiver() {
-    usleep(100);
-    sem_wait(&amp;sem);
-    //printf(&quot;receiver start\n&quot;);
-    key_t key;
-    int msqid;
-    int count;
-    ssize_t mrcv;
-    struct msqid_ds *buf;
-    char msgp[100]={0};
-    key = ftok(&quot;.&quot;,1);
-    msqid = msgget(key,IPC_CREAT);
-    count = 0;
-    while(msgrcv(msqid,msgp,100,0,IPC_NOWAIT)!= -1) {
-        count++;
-        printf(&quot;第%d条信息 %s\n&quot;,count,msgp);
-    }
-    strcpy(msgp,&quot;over&quot;);
-    msgsnd(msqid,msgp,strlen(msgp),MSG_NOERROR);
-    printf(&quot;receiver 发送 over\n&quot;);
-    sem_post(&amp;sem);
-    usleep(100);
-    if(msgctl(msqid,IPC_RMID,buf) == 0)
-        printf(&quot;消息队列删除成功\n&quot;);
-    printf(&quot;-----------------------------\n&quot;);
+    return EFAULT;
 }
-int main(void)  
-{  
-        pthread_t tid1, tid2;    
-        sem_init(&amp;sem, 0, 1);
-        pthread_create(&amp;tid1,NULL,sender,NULL);
-        pthread_create(&amp;tid2,NULL,receiver, NULL);  
-        pthread_join(tid1,NULL); 
-        pthread_join(tid2,NULL);  
-        sem_destroy(&amp;sem);
-        return 0;  
-}   
 
 </code></pre>
 
-<h3 id="toc_7">2. 管道通信、Posix信号量</h3>
+<ul>
+<li>重新编译内核</li>
+</ul>
 
-<pre><code>#include &lt;unistd.h&gt;
-#include &lt;stdlib.h&gt;
+<pre><code>make oldconfig
+make
+make modules
+make modules_install
+make install
+grub2-mkconfig -o /boot/grub2/grub.cfg  //centos
+update-grub2  //ubuntu
+reboot
+</code></pre>
+
+<ul>
+<li>编写用户态程序测试新系统调用 [define的常量修改]</li>
+</ul>
+
+<pre><code>#include &lt;linux/unistd.h&gt;
+#include &lt;sys/syscall.h&gt;
 #include &lt;stdio.h&gt;
-#include &lt;semaphore.h&gt;
-#include &lt;string.h&gt;
-int main()
+#include &lt;stdlib.h&gt;
+#define __NR_mysetnice 549
+
+int main(int argc, char *argv[])
 {
-    int filedes[2];
-    pid_t child1;
-    pid_t child2;
-    pid_t child3;
-    char b_read[100]={0};
-    int num;
-    sem_t sem;
-    sem_init(&amp;sem,1,1);
-    //int pipe(int filedes[2])
-    if(pipe(filedes)&lt;0)
-        exit(-1);
-    else {
-        //close(filedes[0]);
-        //close(filedes[1]);
-    }
-    
-    //filedes[0]读 filedes[1]写
-    pid_t p1 = fork();
-    if(p1==0) {
-        sem_wait(&amp;sem);
-        close(filedes[0]);
-                open(filedes[1]);
-                write(filedes[1],&quot;text&quot;,4);
-                printf(&quot;child1 写入 写入值为TEXT\n\n&quot;);
-                close(filedes[1]);
-                sem_post(&amp;sem);
-                exit(0);
-    }
-    pid_t p2 = fork();
-    if(p2==0) {
-        sem_wait(&amp;sem);
-                close(filedes[0]);
-                open(filedes[1]);
-                write(filedes[1],&quot;text&quot;,4);
-                printf(&quot;child2 写入 写入值为TEXT\n\n&quot;);
-                close(filedes[1]);
-                sem_post(&amp;sem);
-                exit(0);
-    }
-    pid_t p3 = fork();
-    if(p3==0) {
-        sem_wait(&amp;sem);
-        close(filedes[0]);
-        open(filedes[1]);
-        write(filedes[1],&quot;text&quot;,4);
-                printf(&quot;child3 写入 写入值为TEXT\n\n&quot;);
-        close(filedes[1]);
-        sem_post(&amp;sem);
-        exit(0);
-    }
-    int s1,s2,s3,n;
-    //open(filedes[0]);
-    close(filedes[1]);
-    //waitpid(p1,&amp;s1,0);
-    //waitpid(p2,&amp;s2,0);
-    //waitpid(p3,&amp;s3,0);
-    usleep(100);
-    printf(&quot;请输入读取数\n&quot;);
-    scanf(&quot;%d&quot;,&amp;n);
-    printf(&quot;读取%d\n\n&quot;,n);
-    num = read(filedes[0],b_read,n);
-    printf(&quot;返回值%d,读取值%s\n\n&quot;,num,b_read);
-    close(filedes[0]);
-    return 0;
+     pid_t tid;
+     int nicevalue = atoi(argv[1]);
+     tid = getpid();
+     syscall(__NR_mysetnice,tid,0,0);
+     syscall(__NR_mysetnice,tid,1,nicevalue);
+     syscall(__NR_mysetnice,tid,0,0);
+
+     //syscall(__NR_mysetnice,tid,flag,nicevalue);
+     return 0;
 }
+</code></pre>
+
+<ul>
+<li>查看输出内容</li>
+</ul>
+
+<pre><code>dmesg
+</code></pre>
+
+<h2 id="toc_2">Linux内核模块编程</h2>
+
+<blockquote>
+<p>Makefile的KDIR需要修改为内核目录 Makefile 和 OS-2-x.c在同一文件夹内即可 执行make编译</p>
+</blockquote>
+
+<h3 id="toc_3">1</h3>
+
+<ul>
+<li>Makefile</li>
+</ul>
+
+<pre><code>obj-m:=OS-2-1.o
+OS21-objs:=OS-2-1.o
+KDIR:=/home/kannaduki/linux/linux-4.15.15
+PWD:= $(shell pwd)
+default:
+    make -C $(KDIR) M=$(PWD) modules
+clean:
+    make -C $(KDIR) M=$(PWD) clean
 
 </code></pre>
 
-<h3 id="toc_8">1. 模拟的shell</h3>
-
 <ul>
-<li>cmd1、cm2、cmd3.c</li>
+<li>OS-2-1.c</li>
 </ul>
 
-<pre><code>#include&lt;stdio.h&gt;
-void  main(){
-    printf(&quot;cmd1运行完毕\n&quot;);
-}
-
-</code></pre>
-
-<p><code>gcc cmd1.c -o cmd1</code></p>
-
-<ul>
-<li>shell.c</li>
-</ul>
-
-<pre><code>#include&lt;stdio.h&gt;
-#include&lt;stdlib.h&gt;
-#include&lt;string.h&gt;
-#include&lt;unistd.h&gt;
-void  main(){
-    int pid;
-    int i;
-    char *cmd = (char*)malloc(sizeof(20));
-    while(1) {
-        printf(&quot;输入指令\n&quot;);
-        scanf(&quot;%s&quot;,cmd);
-                if(strcmp(cmd,&quot;exit&quot;)==0)       return;
-        pid=vfork();
-        if (pid) {
-            waitpid(pid,NULL,0);
-        }else{
-            if(strcmp(cmd,&quot;cmd1&quot;)==0 || strcmp(cmd,&quot;cmd2&quot;)==0 || strcmp(cmd,&quot;cmd3&quot;)==0){
-                execl(cmd,cmd,NULL);
-            }else{
-                printf(&quot;Command not found\n&quot;);
-                _exit(0);
-            }
+<pre><code>#include&lt;linux/init.h&gt;
+#include&lt;linux/module.h&gt;
+#include&lt;linux/kernel.h&gt;
+// 内核版本为3.X 则为&lt;linux/sched.h&gt;
+#include&lt;linux/sched/signal.h&gt;
+static int hello_init(void)
+{
+        struct task_struct *p= &amp;init_task;
+    printk(KERN_ALERT&quot;\n\n\n----------------------&quot;);
+    printk(KERN_ALERT&quot;------所有进程程序名 pid 进程状态 父进程------&quot;);
+        for_each_process(p) {
+    if(p-&gt;mm == NULL)
+        printk(KERN_ALERT&quot;程序名: %s Pid: %d 进程状态: %ld 父进程pid: %d\n&quot;,p-&gt;comm,p-&gt;pid, p-&gt;state,p-&gt;real_parent-&gt;pid);
         }
-    }
+    printk(KERN_ALERT&quot;----------------------\n\n\n&quot;);
+        return 0;
 }
-
+static void hello_exit(void)
+{
+        printk(KERN_ALERT &quot;______Exit______ !\n&quot;);
+}
+module_init(hello_init);
+module_exit(hello_exit);
+MODULE_LICENSE(&quot;GPL&quot;);
 </code></pre>
 
-<h3 id="toc_9">Linux内核模块编程</h3>
+<h3 id="toc_4">2</h3>
 
 <ul>
 <li>Makefile</li>
@@ -1244,105 +1079,1227 @@ MODULE_LICENSE(&quot;GPL&quot;);
 
 </code></pre>
 
-<h2 id="toc_10">Linux内核编译及添加系统调用</h2>
+<h2 id="toc_5">Linux 进程管理</h2>
 
-<blockquote>
-<p>先安装ccache可以大幅节省多次内核编译时间</p>
-</blockquote>
+<h3 id="toc_6">1. 模拟的shell</h3>
 
 <ul>
-<li>进入内核目录</li>
-<li>分配系统调用号,修改系统调用表<br/></li>
+<li>cmd1、cm2、cmd3.c</li>
 </ul>
 
-<pre><code>vim ./arch/x86/entry/syscalls/syscall_64.tbl
-
-尾部添加 [549]为最后一个系统调用号递增
-549     64      mysetnice               sys_mysetnice
-</code></pre>
-
-<ul>
-<li>申明系统调用服务例程原型<br/></li>
-</ul>
-
-<pre><code>vim ./include/linux/syscalls.h
-
-asmlinkage long sys_mysetnice(pid_t pid,int flag,int nicevalue); //,void __user* prio,void __user* nice);
-</code></pre>
-
-<ul>
-<li>实现系统调用服务例程<br/></li>
-</ul>
-
-<pre><code>vim ./kernel/sys.c
-
-SYSCALL_DEFINE3(mysetnice, pid_t, pid, int, flag, int, nicevalue)
-{
-    struct pid * kpid;
-    struct task_struct * task;
-    int nicebef;
-    kpid = find_get_pid(pid);/* 返回pid */
-    task = pid_task(kpid, PIDTYPE_PID);/* 返回task_struct */
-    nicebef = task_nice(task);/* 返回进程当前nice值 */
-    if(flag == 1)
-    {
-        set_user_nice(task, nicevalue);/* 修改进程nice值 */
-        printk(&quot;修改前nice值：%d\t修改后nice值：%d\n&quot;, nicebef, nicevalue);
-        return 0;
-    }
-    else if(flag == 0)
-    {
-        printk(&quot;该进程的nice值为%d\n&quot;, nicebef);
-        return 0;
-    }
-    return EFAULT;
+<pre><code>#include&lt;stdio.h&gt;
+void  main(){
+    printf(&quot;cmd1运行完毕\n&quot;);
 }
 
 </code></pre>
 
+<p><code>gcc cmd1.c -o cmd1 (cmd2 cmd3 同理)</code></p>
+
 <ul>
-<li>重新编译内核<br/></li>
+<li>shell.c</li>
 </ul>
 
-<pre><code>make oldconfig
-make
-make modules
-make modules_install
-make install
-grub2-mkconfig -o /boot/grub2/grub.cfg  //centos
-update-grub2  //ubuntu
-reboot
+<pre><code>#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+#include&lt;string.h&gt;
+#include&lt;unistd.h&gt;
+void  main(){
+    int pid;
+    int i;
+    char *cmd = (char*)malloc(sizeof(20));
+    while(1) {
+        printf(&quot;输入指令\n&quot;);
+        scanf(&quot;%s&quot;,cmd);
+                if(strcmp(cmd,&quot;exit&quot;)==0)       return;
+        pid=vfork();
+        if (pid) {
+            waitpid(pid,NULL,0);
+        }else{
+            if(strcmp(cmd,&quot;cmd1&quot;)==0 || strcmp(cmd,&quot;cmd2&quot;)==0 || strcmp(cmd,&quot;cmd3&quot;)==0){
+                execl(cmd,cmd,NULL);
+            }else{
+                printf(&quot;Command not found\n&quot;);
+                _exit(0);
+            }
+        }
+    }
+}
+
 </code></pre>
 
-<ul>
-<li>编写用户态程序测试新系统调用<br/></li>
-</ul>
+<p><code>gcc shell.c</code></p>
 
-<pre><code>#include &lt;linux/unistd.h&gt;
-#include &lt;sys/syscall.h&gt;
-#include &lt;stdio.h&gt;
+<h3 id="toc_7">2. 管道通信、Posix信号量</h3>
+
+<pre><code>#include &lt;unistd.h&gt;
 #include &lt;stdlib.h&gt;
-#define __NR_mysetnice 549
+#include &lt;stdio.h&gt;
+#include &lt;semaphore.h&gt;
+#include &lt;string.h&gt;
 
-int main(int argc, char *argv[])
+int main()
 {
-     pid_t tid;
-     int nicevalue = atoi(argv[1]);
-     tid = getpid();
-     syscall(__NR_mysetnice,tid,0,0);
-     syscall(__NR_mysetnice,tid,1,nicevalue);
-     syscall(__NR_mysetnice,tid,0,0);
-
-     //syscall(__NR_mysetnice,tid,flag,nicevalue);
-     return 0;
+    int filedes[2];
+    pid_t child1;
+    pid_t child2;
+    pid_t child3;
+    char b_read[100]={0};
+    int num;
+    sem_t sem;
+    sem_init(&amp;sem,1,1);
+    //int pipe(int filedes[2])
+    if(pipe(filedes)&lt;0)
+        exit(-1);
+    else {
+        //close(filedes[0]);
+        //close(filedes[1]);
+    }
+    
+    //filedes[0]读 filedes[1]写
+    pid_t p1 = fork();
+    if(p1==0) {
+        sem_wait(&amp;sem);
+        close(filedes[0]);
+                open(filedes[1]);
+                write(filedes[1],&quot;1111&quot;,4);
+                printf(&quot;child1 写入 写入值为1111\n\n&quot;);
+                close(filedes[1]);
+                sem_post(&amp;sem);
+                exit(0);
+    }
+    pid_t p2 = fork();
+    if(p2==0) {
+        sem_wait(&amp;sem);
+                close(filedes[0]);
+                open(filedes[1]);
+                write(filedes[1],&quot;2222&quot;,4);
+                printf(&quot;child2 写入 写入值为2222\n\n&quot;);
+                close(filedes[1]);
+                sem_post(&amp;sem);
+                exit(0);
+    }
+    pid_t p3 = fork();
+    if(p3==0) {
+        sem_wait(&amp;sem);
+        close(filedes[0]);
+        open(filedes[1]);
+        write(filedes[1],&quot;3333&quot;,4);
+                printf(&quot;child3 写入 写入值为3333\n\n&quot;);
+        close(filedes[1]);
+        sem_post(&amp;sem);
+        exit(0);
+    }
+    int s1,s2,s3,n;
+    //open(filedes[0]);
+    close(filedes[1]);
+    //waitpid(p1,&amp;s1,0);
+    //waitpid(p2,&amp;s2,0);
+    //waitpid(p3,&amp;s3,0);
+    usleep(400);
+    printf(&quot;请输入读取数\n&quot;);
+    scanf(&quot;%d&quot;,&amp;n);
+    printf(&quot;读取%d\n\n&quot;,n);
+    num = read(filedes[0],b_read,n);
+    printf(&quot;返回值%d,读取值%s\n\n&quot;,num,b_read);
+    close(filedes[0]);
+    return 0;
 }
 </code></pre>
 
+<p><code>gcc OS-3-2.c -o OS-3-2 -pthread</code></p>
+
+<h3 id="toc_8">3. 消息队列、无名信号量</h3>
+
+<pre><code>#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;semaphore.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/ipc.h&gt;
+#include &lt;sys/msg.h&gt;
+
+//  gcc OS-3-3.c -o OS-3-3 -pthread
+//  ./OS-3-3
+//  第三个题和第四个题跑多了好像ftok的key_t会混起来 接收不到信息 改一下或者重启一下就行了
+
+sem_t sem;
+int sval;
+
+void sender() {
+    sem_wait(&amp;sem);
+    key_t key;
+    int msqid,msnd;
+    char msgp[100] = {0};
+    key = ftok(&quot;.&quot;,1);
+    msqid = msgget(key,IPC_CREAT);
+    while(1) {
+        printf(&quot;请输入消息\n&quot;);
+        scanf(&quot;%s&quot;,msgp);
+        if(strcmp(msgp,&quot;exit&quot;)==0){
+            strcpy(msgp,&quot;end&quot;);
+            msnd = msgsnd(msqid,msgp,strlen(msgp),MSG_NOERROR);
+            printf(&quot;--------------------------------\n&quot;);
+            printf(&quot;发送%d个字符(end),应答信息如下\n&quot;,strlen(msgp));
+            break;
+        }else{
+            msnd = msgsnd(msqid,msgp,strlen(msgp),MSG_NOERROR);
+            printf(&quot;发送%d个字符,输入exit应答\n&quot;,strlen(msgp));
+        }
+    }
+    //msnd = msgsnd(msqid,msgp,strlen(msgp),MSG_NOERROR);
+    //printf(&quot;sender key_t: %d IPC:%d \n&quot;,key,msqid);
+    sem_post(&amp;sem);
+    usleep(100);
+    sem_wait(&amp;sem);
+    msgrcv(msqid,msgp,100,0,0);
+    printf(&quot;sender 接收 %s\n&quot;,msgp);
+    sem_post(&amp;sem);
+} 
+void receiver() {
+    usleep(100);
+    sem_wait(&amp;sem);
+    //printf(&quot;receiver start\n&quot;);
+    key_t key;
+    int msqid;
+    int count;
+    ssize_t mrcv;
+    struct msqid_ds *buf;
+    char msgp[100]={0};
+    key = ftok(&quot;.&quot;,1);
+    msqid = msgget(key,IPC_CREAT);
+    count = 0;
+    while(msgrcv(msqid,msgp,100,0,IPC_NOWAIT)!= -1) {
+        count++;
+        printf(&quot;第%d条信息 %s\n&quot;,count,msgp);
+    }
+    strcpy(msgp,&quot;over&quot;);
+    msgsnd(msqid,msgp,strlen(msgp),MSG_NOERROR);
+    printf(&quot;receiver 发送 over\n&quot;);
+    sem_post(&amp;sem);
+    usleep(100);
+    if(msgctl(msqid,IPC_RMID,buf) == 0)
+        printf(&quot;消息队列删除成功\n&quot;);
+    printf(&quot;-----------------------------\n&quot;);
+}
+
+int main(void) 
+{ 
+        pthread_t tid1, tid2;    
+        sem_init(&amp;sem, 0, 1);
+        pthread_create(&amp;tid1,NULL,sender,NULL);
+        pthread_create(&amp;tid2,NULL,receiver, NULL);  
+        pthread_join(tid1,NULL); 
+        pthread_join(tid2,NULL);  
+        sem_destroy(&amp;sem);
+        return 0;  
+} 
+
+</code></pre>
+
+<h3 id="toc_9">4.共享内存、有名信号量</h3>
+
 <ul>
-<li>查看输出内容<br/></li>
+<li>sender.c</li>
 </ul>
 
-<pre><code>dmesg
+<pre><code>#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;semaphore.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/ipc.h&gt;
+#include &lt;sys/msg.h&gt;
+#include &lt;sys/shm.h&gt;
+#include &lt;fcntl.h&gt;
+
+struct shm_msg {
+    pid_t pid;
+    char msg[100];
+};
+
+int main() {
+    sem_t *sem;
+    int shmid;
+    char msg[100];
+    struct shm_msg *shmaddr;
+    sem = sem_open(&quot;mysem&quot;,O_CREAT,0644,1);
+    shmid = shmget(ftok(&quot;.&quot;,1),1024,IPC_CREAT);
+    shmaddr = shmat(shmid,0,0);
+    shmaddr-&gt;pid = -1;
+    printf(&quot;请输入字符串\n&quot;);
+    scanf(&quot;%s&quot;,msg);
+    sem_wait(sem);
+    shmaddr-&gt;pid = 1;
+    strcpy(shmaddr-&gt;msg,msg);
+    printf(&quot;sender 发送 %s\n&quot;,shmaddr-&gt;msg);
+    sem_post(sem);
+    while(1) {
+        if(shmaddr-&gt;pid == 0){
+            sem_wait(sem);
+            printf(&quot;sender 接收 %s&quot;,shmaddr-&gt;msg);
+            break;
+        }
+    }
+    sem_post(sem);
+    sem_close(sem);
+    sem_unlink(&quot;mysem&quot;);
+    return 0;
+} 
+
+</code></pre>
+
+<ul>
+<li>receiver.c </li>
+</ul>
+
+<pre><code>#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;semaphore.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/ipc.h&gt;
+#include &lt;sys/msg.h&gt;
+#include &lt;sys/shm.h&gt;
+#include &lt;fcntl.h&gt;
+
+struct shm_msg {
+    pid_t pid;
+    char msg[100];
+};
+
+int main() 
+{
+    sem_t *sem;
+    int shmid;
+    char msg[100];
+    struct shm_msg *shmaddr;
+    sem = sem_open(&quot;mysem&quot;,O_CREAT,0644,1);
+    shmid = shmget(ftok(&quot;.&quot;,1),1024,IPC_CREAT);
+    shmaddr = shmat(shmid,0,0);
+    while(1) {
+        if(shmaddr-&gt;pid == 1){
+            sem_wait(sem);
+            printf(&quot;receiver 接收 %s\n&quot;,shmaddr-&gt;msg);
+            strcpy(shmaddr-&gt;msg,&quot;over&quot;);
+            printf(&quot;receiver 发送 %s \n&quot;,shmaddr-&gt;msg);
+            shmaddr-&gt;pid = 0;
+            break;
+        }
+    }
+    sem_post(sem);
+    sem_close(sem);
+      return 0; 
+} 
+
+</code></pre>
+
+<p><code>打开两个终端 一个执行sender 一个执行receiver sender发送信息后receiver会接收</code></p>
+
+<h2 id="toc_10">文件系统</h2>
+
+<h3 id="toc_11">结构</h3>
+
+<pre><code>#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+#include&lt;time.h&gt;
+#include&lt;string.h&gt;
+
+#define BLOCKSIZE 1024
+#define SIZE 1024000
+#define END 65535
+#define FREE 0
+#define MAXOPENFILE 10
+#define CUVER 0
+#define APPEND 1
+
+#pragma warning(disable:4996)
+
+typedef struct BLOCK0 {
+    char infomation[50];  //你想要提示的第一句话
+    unsigned short blocksize;   //设成1024，单位B
+    unsigned short totalsize;   //设成1000，单位KB
+    unsigned short fat_num; // fat表的数量，设成2
+    unsigned short root;// 根目录文件的起始盘块号
+    unsigned char *startblock;
+    /*tsz:对free的管理需要完善*/
+    unsigned free_block;    //剩余未使用的块数
+}block0;
+
+typedef struct FCB {
+    char filename[8];   //文件名
+    char exname[3]; //扩展名
+    unsigned char attribute;    //属性，0目录；1文件
+    unsigned short time;
+    unsigned short data;
+    unsigned short first;
+    unsigned long length;
+    char free;  //0为空，1相反
+    char reserved[7];   //预留，同时也为了内存对齐
+}fcb;
+
+
+// /* 这个数据结构为长文件准备，以倒序顺序放在长文件FCB的前面*/
+//typedef struct EXTEND_NAME{
+//    unsigned char endflag; /*若end是1则为最后一个EXTEND_NAME，否则为0*/
+//    char extname1[10];   /*扩展名的存储位置1*/
+//    unsigned char attribute;    /*属性，长文件的扩展名的属性为4*/
+//    char extname2[20];   /*扩展名的存储位置2*/
+//}ext_name;
+
+typedef struct FAT {
+    unsigned short id;
+}fat;
+
+typedef struct USEROPEN {
+    char filename[8];
+    char exname[4];
+    unsigned char attribute;
+    unsigned short time;
+    unsigned short data;
+    unsigned short first;
+    unsigned long length;
+    char free;
+    fcb *ptrfcb;    //指向加载的fcb
+    int count; //读写指针的位置
+    short fcbstate;// 是否修改了文件的FCB的内容，1：修改；0：未修改
+    short topenfile;// 户打开表项是否为空，0：空；1：已分配
+}useropen;
+
+unsigned char *myvhard; //虚拟磁盘开始位置的指针
+useropen openfilelist[MAXOPENFILE];
+char currentdir[100];
+unsigned char* startp;  //磁盘数据区开始位置的指针
+useropen *ptrcurdir;// 指向用户打开文件表中的当前目录所在打开文件表项的位置
+fat *fat1;
+fat *fat2;
+</code></pre>
+
+<h3 id="toc_12">函数</h3>
+
+<pre><code>
+void info() {
+    block0 *p = (block0*)myvhard;
+    printf(&quot;*\t%s\n&quot;, p-&gt;infomation);
+    printf(&quot;*\t块大小为:%dB,总大小为:%dKB\n&quot;, p-&gt;blocksize, p-&gt;totalsize);
+    printf(&quot;*\tfat表数量为:%d\n&quot;, p-&gt;fat_num);
+    printf(&quot;*\t数据区的开始块数为:%d\n&quot;, p-&gt;root);
+    printf(&quot;*\t剩余未分配块数为:%d\n&quot;, p-&gt;free_block);
+}
+
+void help() {
+    printf(&quot;*\t命令名称\t参数\t\t解释\n&quot;);
+    printf(&quot;*\tinfo\t\t无\t\t获取文件系统整体信息\n&quot;);
+    printf(&quot;*\thelp\t\t无\t\t获取所有命令的说明\n&quot;);
+    printf(&quot;*\tcd\t\tdirname\t\t改变当前目录到指定的名为 dirname 的目录\n&quot;);
+    printf(&quot;*\topen\t\tfilename\t打开当前目录下名为 filename 的文件\n&quot;);
+    printf(&quot;*\tformat\t\t无\t\t对虚拟磁盘进行格式化,布局虚拟磁盘,建立根目录文件（或根目录区）\n&quot;);
+    printf(&quot;*\tmkdir\t\tdirname\t\t在当前目录下创建名为 dirname 的子目录\n&quot;);
+    printf(&quot;*\trmdir\t\tdirname\t\t在当前目录下删除名为 dirname 的子目录\n&quot;);
+    printf(&quot;*\tls\t\t无\t\t显示当前目录的内容（子目录和文件信息）\n&quot;);
+    printf(&quot;*\tcreate\t\tfilename\t创建名为 filename 的新文件\n&quot;);
+    printf(&quot;*\tclose\t\tfd\t\t关闭前面由 my_open 打开的文件描述符为 fd 的文件\n&quot;);
+    printf(&quot;*\twrite\t\tfd\t\t将接下来输入的文本保存到前面由 my_open 打开的文件描述符为 fd 的文件\n&quot;);
+    printf(&quot;*\tread\t\tfd\t\t将前面由 my_open 打开的文件描述符为 fd 的文件中读取 1024 个字节的文本\n&quot;);
+    printf(&quot;*\trm\t\tfilename\t删除名为 filename 的文件\n&quot;);
+    printf(&quot;*\texit\t\t无\t\t退出文件系统\n&quot;);
+    printf(&quot;*\tshow\t\t无\t\t显示所有已打开文件的fd值\n&quot;);
+}
+
+void fcbcpy(int i, fcb *fileFcb) {
+    strcpy(openfilelist[i].filename, fileFcb-&gt;filename);
+    strcpy(openfilelist[i].exname, fileFcb-&gt;exname);
+    openfilelist[i].attribute = fileFcb-&gt;attribute;
+    openfilelist[i].time = fileFcb-&gt;time;
+    openfilelist[i].data = fileFcb-&gt;data;
+    openfilelist[i].first = fileFcb-&gt;first;
+    openfilelist[i].length = fileFcb-&gt;length;
+    openfilelist[i].free = fileFcb-&gt;free;
+    openfilelist[i].ptrfcb = fileFcb;
+    openfilelist[i].fcbstate = 0;
+    openfilelist[i].topenfile = 1;
+    openfilelist[i].count = 0;
+}
+
+void init_fat1() {
+    fat *p = (fat*)(myvhard + BLOCKSIZE);
+    fat *p1, *p2;
+    p1 = p2 = p;
+    int i;
+    for (i = 0; i&lt;2 * BLOCKSIZE / sizeof(fat); ++i, ++p1)(p1-&gt;id) = FREE;
+    for (i = 0; i&lt;7; ++i, ++p2)p2-&gt;id = END;
+    p[5].id = 6;
+    fat1 = (fat*)(myvhard + BLOCKSIZE);
+    fat2 = (fat*)(myvhard + 3 * BLOCKSIZE);
+}
+
+void init_b0() {
+    block0 *p_b0 = (block0*)myvhard;
+    strcpy(p_b0-&gt;infomation, &quot;File System made by 陈王杰 汤胜中 徐时越 包治宽&quot;);
+    p_b0-&gt;blocksize = BLOCKSIZE;
+    p_b0-&gt;totalsize = SIZE / 1024;
+    p_b0-&gt;fat_num = 2;
+    p_b0-&gt;root = 5;
+    p_b0-&gt;startblock = myvhard + 5 * BLOCKSIZE;
+    p_b0-&gt;free_block = (SIZE / BLOCKSIZE) - 6;
+}
+
+void bak_fat1() {
+    memcpy(myvhard + 3 * BLOCKSIZE, myvhard + BLOCKSIZE, 2 * BLOCKSIZE);
+}
+
+void get_time(int *data_time) {
+    time_t now;
+    time(&amp;now);
+    struct tm *nowtime;
+    nowtime = localtime(&amp;now);
+    data_time[1] = nowtime-&gt;tm_hour * 2048 + nowtime-&gt;tm_min * 32 + nowtime-&gt;tm_sec / 2;  /*前面的两个乘是为了移位*/
+    data_time[0] = (nowtime-&gt;tm_year - 80) * 512 + (nowtime-&gt;tm_mon + 1) * 32 + nowtime-&gt;tm_mday;
+}
+
+void check_enough_block(int block_index,int blocknum_need) {
+    fat temp=fat1[block_index];
+    int i,j;
+    for (i = 0; i &lt; blocknum_need; ++i) {
+        if (temp.id == END)break;
+        if(i!=blocknum_need-1){
+            int need_new = blocknum_need - i - 1;
+            for (j = 0; j &lt; need_new; ++j)temp.id = dirst_block();
+            temp = fat1[temp.id];
+            temp.id = END;
+        }
+    }
+}
+
+void clean_openfilelist(int index) {
+    strcpy(openfilelist[index].filename, &quot;\0&quot;);
+    strcpy(openfilelist[index].exname, &quot;\0&quot;);
+    openfilelist[index].attribute = 0;
+    openfilelist[index].time = 0;
+    openfilelist[index].data = 0;
+    openfilelist[index].first = 0;
+    openfilelist[index].length = 0;
+    openfilelist[index].fcbstate = 0;
+    openfilelist[index].ptrfcb = NULL;
+    openfilelist[index].free = 0;
+    openfilelist[index].topenfile = 0;
+    openfilelist[index].count = 0;
+}
+
+int is_rootdir(fcb *fileFcb) {
+    if (fileFcb-&gt;first == 5)return 1;
+    else return 0;
+}
+
+int getblocknum_fromfilelen(int len) {
+    if (len == 0)return 1;
+    else return len % BLOCKSIZE == 0 ? (len / BLOCKSIZE) : (len / BLOCKSIZE + 1);
+}
+
+fcb* exist_file(fcb *fileFcb,char* filename) {
+    int length = fileFcb-&gt;length;
+    int flag = 0;
+    int i;
+    for (i = 0; i &lt; length / sizeof(fcb); i++, ++fileFcb) {
+        if (!strcmp(fileFcb-&gt;filename, filename)) {
+            flag = 1;
+            break;
+        }
+        if (fileFcb-&gt;free == 0)
+            i--;
+    }
+    if (flag == 0)return NULL;
+    else return fileFcb;
+}
+
+/*创建新文件夹时，传入为为新文件夹分配的块号即可快速完成新文件目录下的.和..的创建*/
+/*root参数一般传0就好*/
+void fast_dir(int dirst_block, int root) {
+    char* block_start = (char*)myvhard + dirst_block * BLOCKSIZE;
+    fcb* p = (fcb*)block_start;
+    int i;
+    for (i = 0; i&lt;BLOCKSIZE / sizeof(fcb); ++i, ++p)p-&gt;free = 0;
+    fcb *cur = (fcb*)block_start;
+    fcb *father = (cur + 1);
+    int data_time[2];
+    get_time(data_time);
+    strcpy(cur-&gt;filename, &quot;.&quot;);
+    strcpy(father-&gt;filename, &quot;..&quot;);
+    strcpy(cur-&gt;exname, &quot;di&quot;);
+    strcpy(father-&gt;exname, &quot;di&quot;);
+    cur-&gt;attribute = father-&gt;attribute = 0;
+    cur-&gt;time = father-&gt;time = data_time[1];
+    cur-&gt;data = father-&gt;data = data_time[0];
+    cur-&gt;first = dirst_block;
+    cur-&gt;length = 2 * sizeof(fcb);
+    if (root) {
+        father-&gt;first = cur-&gt;first;
+        father-&gt;length = cur-&gt;length;
+    }
+    else {
+        i = get_curnum();
+        father-&gt;first = openfilelist[i].first;
+        father-&gt;length = openfilelist[i].length;
+    }
+    cur-&gt;free = father-&gt;free = 1;
+    fat1[dirst_block].id = END;
+    fat2[dirst_block].id = END;
+}
+
+void fast_dirfcb(fcb *fileFcb, char *dirname,int dirst_block) {
+    strcpy(fileFcb-&gt;filename, dirname);
+    strcpy(fileFcb-&gt;exname, &quot;di&quot;);
+    fileFcb-&gt;attribute = 0;
+    int time[2];
+    get_time(time);
+    fileFcb-&gt;time = time[1];
+    fileFcb-&gt;data = time[0];
+    fileFcb-&gt;first = dirst_block;
+    fileFcb-&gt;free = 1;
+    fileFcb-&gt;length = 2 * sizeof(fcb);
+}
+/* fat的前5个给了block0,fat1,fat2*/
+void my_format() {
+    init_b0();
+    init_fat1();
+    bak_fat1();
+    fast_dir(5, 1);
+}
+
+void startsys() {
+    myvhard = (unsigned char*)malloc(SIZE);
+    memset(myvhard, 0, SIZE);
+    FILE * fp;
+    if ((fp = fopen(&quot;./my_fs&quot;, &quot;r&quot;)) != NULL) {
+        fread(myvhard, SIZE, 1, fp);
+        fclose(fp);
+    }
+    else {
+        printf(&quot;*\tfile not found!new file created!\n&quot;);
+        my_format();
+    }
+    fcbcpy(0, (fcb*)(myvhard + 5 * BLOCKSIZE));
+    ptrcurdir = &amp;openfilelist[0];
+
+    /*初始化后面的所有opoenfilelist项*/
+    int i;
+    for (i = 1; i &lt; MAXOPENFILE; i++) {
+        clean_openfilelist(i);
+    }
+
+    /*设置一些全局变量*/
+    strcpy(currentdir, &quot;/&quot;);
+    startp = ((block0 *)myvhard)-&gt;startblock;
+    fat1 = (fat*)(myvhard + BLOCKSIZE);
+    fat2 = (fat*)(myvhard + 3 * BLOCKSIZE);
+}
+
+int get_curnum() {
+    return(ptrcurdir - openfilelist);
+}
+
+int dirst_block() {
+    int i, freeBlock;
+    fat *fat1 = (fat *)(myvhard + BLOCKSIZE);
+    fat *fat2 = (fat *)(myvhard + BLOCKSIZE * 3);
+    int flag = 0;
+    for (i = 0; i &lt; BLOCKSIZE * 2 / sizeof(fat); i++) {
+        if (fat1-&gt;id == FREE) {
+            flag = 1;
+            freeBlock = i;
+            return i;
+        }
+        fat1++;
+        fat2++;
+    }
+    if (flag == 0) {
+        printf(&quot;FAT满了！&quot;);
+        return -1;
+    }
+}
+
+int get_block_num(int start_block) {
+    int i = 1;
+    fat *fat1 = (fat*)(myvhard + BLOCKSIZE);
+    fat *fat_t = fat1 + start_block;
+    if (fat_t-&gt;id == FREE)return 0;
+    else {
+        while (fat_t-&gt;id != END) {
+            ++i;
+            fat_t = fat1 + fat_t-&gt;id;
+        }
+    }
+    return i;
+}
+
+void fast_file(fcb*fileFcb, char *filename, int dirstblock) {
+    strcpy(fileFcb-&gt;filename, filename);
+    strcpy(fileFcb-&gt;exname, &quot;txt&quot;);
+    fileFcb-&gt;attribute = 1;
+    int time[2];
+    get_time(time);
+    fileFcb-&gt;time = time[1];
+    fileFcb-&gt;data = time[0];
+    fileFcb-&gt;first = dirstblock;
+    fileFcb-&gt;free = 1;
+    fileFcb-&gt;length = 0;
+    fat *fat1 = (fat*)(myvhard + BLOCKSIZE);
+    fat *fat2 = (fat*)(myvhard + 3*BLOCKSIZE);
+    fat1[dirstblock].id = END;
+    fat2[dirstblock].id = END;
+}
+
+void update_dir(char *filename) {
+    if (strcmp(filename, &quot;.&quot;) &amp;&amp; strcmp(filename, &quot;..&quot;)) {
+        if (!strcmp(currentdir, &quot;/&quot;))strcat(currentdir, filename);
+        else {
+            strcat(currentdir, &quot;/&quot;);
+            strcat(currentdir, filename);
+        }
+    }
+}
+
+void update_dir_father() {
+    int last = findlast();
+    currentdir[last] = &#39;\0&#39;;
+}
+
+int findlast() {
+    int i, j;
+    i = j = 0;
+    while (currentdir[i] != &#39;\0&#39;) {
+        if (currentdir[i] == &#39;/&#39;)j = i;
+        ++i;
+    }
+    if (j == 0)++j;
+    return j;
+}
+
+void my_ls() {
+    printf(&quot;filename\texname\t\ttime\t\tdata\t\tsize\n&quot;);
+    /*找到当前目录再openfilelist中得位置*/
+    int i = get_curnum();
+    // 读取当前目录文件的内容到内存
+    char *buf = (char *)malloc(1024);
+    do_read(i, 1024, buf);
+    fcb *fileFcb = (fcb *)buf;
+    int num = fileFcb-&gt;length / sizeof(fcb);
+    for (i = 0; i &lt; num; i++, fileFcb++) {   /*只有fileFCB是真的文件(目录)，i才会增加*/
+        if (fileFcb-&gt;free == 1) {
+            char exname[4];
+        int j;
+            for (j = 0; j&lt;3; ++j)exname[j] = fileFcb-&gt;exname[j];
+            exname[3] = &#39;\0&#39;;
+            printf(&quot;%s\t\t%s\t\t%02d:%02d:%02d\t%02d,%02d,%02d\t%d\n&quot;, fileFcb-&gt;filename, exname, fileFcb-&gt;time / 2048, (fileFcb-&gt;time % 2048) / 32, (fileFcb-&gt;time % 32) * 2, fileFcb-&gt;data / 512 + 1980, fileFcb-&gt;data % 512 / 32,
+                   fileFcb-&gt;data % 32, fileFcb-&gt;length);
+        }
+        else i--;
+    }
+    free(buf);
+}
+
+void my_mkdir(char *dirname) {
+    int i = get_curnum();
+    int curOpenNum = i;
+    char *buf = (char *)malloc(1024);
+    do_read(i, 1024, buf);
+    fcb *fileFcb = (fcb *)buf;
+    int fcb_num = fileFcb-&gt;length / sizeof(fcb);
+    for (i = 0; i &lt; fcb_num; ++i, ++fileFcb) {
+        if (!strcmp(fileFcb-&gt;filename, dirname)) {
+            printf(&quot;目录重名\n&quot;);
+            free(buf);
+            return;
+        }
+        if (fileFcb-&gt;free == 0)
+            i--;
+    }
+    for (i = 0; i &lt; MAXOPENFILE; ++i) {
+        if (openfilelist[i].topenfile == 0) {
+            break;
+        }
+    }
+    if (i == MAXOPENFILE) {
+        printf(&quot;无剩余openuserlist项!\n&quot;);
+        free(buf);
+        return;
+    }
+    int freeBlock = dirst_block();
+    if (freeBlock==-1) {
+        printf(&quot;FAT已满!\n&quot;);
+        free(buf);
+        return;
+    }
+    //为新目录分配fcb
+    fileFcb = (fcb *)buf;
+    int isroot = is_rootdir(fileFcb);
+    for (i = 0; i &lt; fcb_num; i++, fileFcb++) {
+        if (!strcmp(fileFcb-&gt;filename, &quot;.&quot;)) {
+            fileFcb-&gt;length += sizeof(fcb);
+        }
+        //when root is current directory
+        if(isroot&amp;&amp; !strcmp(fileFcb-&gt;filename, &quot;..&quot;))fileFcb-&gt;length += sizeof(fcb);
+        if (fileFcb-&gt;free == 0)break;
+    }
+    //update openfilelist
+    openfilelist[curOpenNum].length += sizeof(fcb);
+    fast_dirfcb(fileFcb, dirname, freeBlock);
+    fast_dir(freeBlock, 0);
+    do_write(curOpenNum, buf, 1024, 0);
+    free(buf);
+}
+
+void my_rm(char *filename) {
+    // 读取当前目录文件的内容到内存
+    char *buf = (char *)malloc(1024);;
+    int i=get_curnum();
+    int fd = i;
+    do_read(i, 1024, buf);
+    // 检查要删除的目录是否存在
+    fcb *fileFcb = (fcb *)buf;
+    fileFcb = exist_file(fileFcb, filename);
+    if (!fileFcb) {
+        printf(&quot;%s文件(目录)不存在！\n&quot;, filename);
+        return;
+    }
+   if(fileFcb-&gt;attribute==0){
+    printf(&quot;不能删除目录\n&quot;);
+    free(buf);
+    return;
+    } else {
+    int j;
+    for(j=0;j&lt;MAXOPENFILE;++j) {
+        if(openfilelist[j].topenfile==1 &amp;&amp; !strcmp(openfilelist[j].filename,fileFcb-&gt;filename)) {
+            printf(&quot;文件正在被使用&quot;);
+            free(buf);
+            return;     
+        }
+    }
+     }
+    // 回收磁盘块
+    int index = fileFcb-&gt;first;
+    int indexT;
+    do {
+        indexT = fat1[index].id;
+        fat1[index].id = FREE;
+        fat2[index].id = FREE;
+        index = indexT;
+    } while (index != END);
+    // 清空目录项
+    fileFcb-&gt;filename[0] = &#39;\0&#39;;
+    fileFcb-&gt;free = 0;
+    fileFcb = (fcb *)buf;
+    // 修改目录的长度
+    fileFcb-&gt;length -= sizeof(fcb);
+    do_write(fd, buf, 1024, 0);
+    ptrcurdir-&gt;length -= sizeof(fcb);
+    free(buf);
+}
+
+void my_close(int fd) {
+    if (fd &gt;= MAXOPENFILE)
+    {
+        printf(&quot;fd不是有效数字\n&quot;);
+        return;
+    }
+    else if (openfilelist[fd].topenfile == 0) {
+        printf(&quot;文件未打开!\n&quot;);
+        return;
+    }
+    //else if (openfilelist[fd].fcbstate == 1) {
+    //  //暂时只需要改length
+    //  update_fcb(fd);
+    //}
+    clean_openfilelist(fd);
+}
+
+void my_rmdir(char *dirname) {
+    int i = 0;
+    char *buf = (char *)malloc(1024);
+    i = get_curnum();
+    int fd = i;
+    do_read(i, 1024, buf);
+
+    // 检查要删除的目录是否存在
+    fcb *fileFcb = (fcb *)buf;
+    fileFcb = exist_file(fileFcb, dirname);
+    if (!fileFcb) {
+        printf(&quot;%s文件(目录)不存在！\n&quot;, dirname);
+        return;
+    }
+    // 检查要删除的目录文件是否为空
+    fcb *temp = (fcb *)(myvhard + BLOCKSIZE * fileFcb-&gt;first);
+    if (temp-&gt;length &gt; 2 * sizeof(fcb)) {
+        printf(&quot;目录不为空,不可删除!\n&quot;);
+        return;
+    }
+    int flag = 0;
+    // 检查该目录是否已经打开
+    for (i = 0; i &lt; MAXOPENFILE; i++) {
+        if (strcmp(openfilelist[i].filename, dirname) == 0) {
+            flag = 1;
+            break;
+        }
+    }
+    if (flag == 1) {//f 把打开的目录关闭
+        my_close(i);
+    }
+
+    // 回收磁盘块
+    int index = fileFcb-&gt;first;
+    int indexT;
+    //length = fileFcb-&gt;length;
+    do {
+        indexT = fat1[index].id;
+        fat1[index].id = FREE;
+        fat2[index].id = FREE;
+        index = indexT;
+    } while (index != END);
+
+    // 清空目录项,将其free设置为0即可,然后是将上层目录的长度进行更新,同时对于openlist中也要更新,因为其指向并不相同.
+    fileFcb-&gt;filename[0] = &#39;\0&#39;;
+    fileFcb-&gt;free = 0;
+    fileFcb = (fcb *)buf;
+    fileFcb-&gt;length -=sizeof(fcb);
+    ptrcurdir-&gt;length -= sizeof(fcb);
+    do_write(fd, buf, 1024, 0);
+    free(buf);
+}
+
+void my_create(char *filename) {
+    int i = get_curnum();
+    int curOpenNum = i;
+    int block_num = get_block_num(openfilelist[i].first);
+    int fcb_num = openfilelist[i].length / sizeof(fcb);
+    char *buf = (char *)malloc(block_num * 1024);
+    /* 把所有块的数据都读到buf里面去*/
+    do_read(i, block_num * 1024, buf);
+    fcb *fileFcb = (fcb *)buf;
+    for (i = 0; i &lt; fcb_num; i++, ++fileFcb) {
+        if (!strcmp(fileFcb-&gt;filename, filename)) {
+            printf(&quot;文件重名！&quot;);
+            free(buf);
+            return;
+            break;
+        }
+        if (fileFcb-&gt;free == 0)
+            i--;
+    }
+    int freeBlock = dirst_block();
+    if (freeBlock == -1) {
+        free(buf);
+        return;
+    }
+    // 在当前目录中分配FCB给新的目录fcb
+    fileFcb = (fcb *)buf;
+    for (i = 0; i &lt; fcb_num; ++i, ++fileFcb) {
+        if (!strcmp(fileFcb-&gt;filename, &quot;.&quot;)) {
+            fileFcb-&gt;length += sizeof(fcb);
+            /* check if it is root directory*/
+            if (fileFcb-&gt;first == 5)(fileFcb + 1)-&gt;length = fileFcb-&gt;length;
+        }
+        if (fileFcb-&gt;free == 0)
+            break;
+    }
+    fast_file(fileFcb, filename, freeBlock);
+    ptrcurdir-&gt;length += sizeof(fcb);
+    do_write(curOpenNum, buf, 1024, 0);
+    free(buf);
+}
+
+void my_cd(char *dirname) {
+    // 打开该目录文件
+    int fd = my_open(dirname);
+    switch (fd) {
+        case -1:break;
+        case -2:break;
+        case -3:update_dir_father(); break;
+        default:update_dir(dirname); break;
+    }
+
+}
+
+int my_open(char *filename) {
+    int i = get_curnum();
+    fcb *p = (fcb*)(myvhard + (openfilelist[i].first)*BLOCKSIZE);
+    int block_num = get_block_num(openfilelist[i].first);
+    int fcb_num = openfilelist[i].length / sizeof(fcb);
+    char *buf = (char *)malloc(block_num * 1024);
+    /* 把所有块的数据都读到buf里面去*/
+    do_read(i, block_num * 1024, buf);
+    fcb *fileFcb = (fcb *)buf;
+    int flag = 0;
+    //找到此fcb，同时检查文件存不存在
+    for (i = 0; i &lt; fcb_num; i++, fileFcb++) {
+        if (!strcmp(fileFcb-&gt;filename, filename)) {
+            flag = 1;
+            break;
+        }
+    }
+    if (flag == 0) {
+        printf(&quot;文件不存在!\n&quot;);
+        return -2;
+    }
+    //得到真正的pcb指针
+    p+=(fileFcb - (fcb*)buf);
+    // 检查文件是否已打开
+    for (i = 0; i &lt; MAXOPENFILE; i++) {
+        if (openfilelist[i].topenfile == 1 &amp;&amp; openfilelist[i].first == fileFcb-&gt;first) {    //用first来判断是否同一个文件，注意不能用filename
+            if (!strcmp(fileFcb-&gt;filename, &quot;..&quot;) &amp;&amp; (ptrcurdir-&gt;first != 5)) {  //如果是打开上个目录并且不是在根目录
+                // 找到当前文件夹并关闭
+                int j = 0;
+                for (j = 0; j&lt;MAXOPENFILE; j++)
+                    if (openfilelist[j].free == 1 &amp;&amp; (&amp;openfilelist[j]) == ptrcurdir)
+                        my_close(j);
+                // 打开上级目录
+                for (j = 0; j&lt;MAXOPENFILE; j++)
+                    if (openfilelist[j].free = 1 &amp;&amp; openfilelist[j].first == fileFcb-&gt;first)
+                        ptrcurdir = &amp;openfilelist[j];
+                free(buf);
+                printf(&quot;打开上级目录!\n&quot;);
+                return -3;
+            }
+            free(buf);
+            printf(&quot;文件已打开!\n&quot;);
+            return -1;
+        }
+    }
+    // 检查opefilelist是否有空余
+    int fd;
+    flag = 0;
+    for (i = 0; i &lt; MAXOPENFILE; i++) {
+        if (openfilelist[i].topenfile == 0) {
+            fd = i;
+            flag = 1;
+            break;
+        }
+    }
+    if (flag == 0) {
+        printf(&quot;文件打开太多！\n&quot;);
+        free(buf);
+        return -1;
+    }
+    // 填写打开分配的openfilelist
+    fcbcpy(i, p);
+    if(fileFcb-&gt;attribute==0)ptrcurdir = &amp;openfilelist[i];
+    if(fileFcb-&gt;attribute==1)printf(&quot;打开文件的fd是%d\n&quot;, fd);
+    free(buf);
+    return fd;
+}
+
+void my_write(int fd) {
+    if (openfilelist[fd].attribute == 0) {
+        printf(&quot;can&#39;t write directory!\n&quot;);
+        return;
+    }
+    int writeStyle;
+    char *text = (char *)malloc(BLOCKSIZE);
+    int index = -1;
+    char c_temp;
+    unsigned short block_index=openfilelist[fd].first;
+    if (fd &gt;= MAXOPENFILE || fd &lt; 0) {
+        printf(&quot;fd超出范围\n&quot;);
+        return;
+    }
+    printf(&quot;请选择写入方式(0.覆盖写 1.追加写 2.覆盖写一行 3.追加写一行)\n&quot;);
+    scanf(&quot;%d&quot;, &amp;writeStyle);
+    getchar();
+    printf(&quot;请输入内容：\n&quot;);
+    while ((c_temp = getchar()) != &#39;\n&#39;)text[(++index)] = c_temp;
+    if (writeStyle == 2 || writeStyle == 3) {
+        text[(++index)] = &#39;\n&#39;;
+        writeStyle -= 2;
+    }
+    int len = (index + 1);
+    int writed_len = do_write(fd, text, len, writeStyle); //返回实际写入字节数;
+    if (writed_len != -1 &amp;&amp; writed_len == len) {
+        printf(&quot;写入成功，共写入 %d 个字节\n&quot;, writed_len);
+        //update openfilelist
+        if (writeStyle == 0) {
+            openfilelist[fd].count=openfilelist[fd].length = len;
+            openfilelist[fd].ptrfcb-&gt;length = len;
+        }
+        else {
+            openfilelist[fd].count += len;
+            openfilelist[fd].length = openfilelist[fd].count;
+            openfilelist[fd].ptrfcb-&gt;length = openfilelist[fd].count;
+        }
+        openfilelist[fd].fcbstate = 1;
+    }
+    else printf(&quot;something wrong in writing!\n&quot;);
+    free(text);
+}
+void my_read(int fd, int len) {
+    int i;
+    int j = 0;
+    for (i = 0; i &lt; MAXOPENFILE; i++) {
+        if (fd == 0)break;
+        if (openfilelist[i].topenfile == 1)fd--;
+    }
+    fd = i;
+    char *text = (char *)malloc(BLOCKSIZE);
+    if (fd&gt;MAXOPENFILE || fd&lt;0)printf(&quot;超过操作边界\n&quot;);
+    else {
+        printf(&quot;读出字节数：%d\n&quot;,do_read(fd,len,text));
+        text[len]=&#39;\0&#39;;
+        printf(&quot;%s\n&quot;, text);
+    }
+    free(text);
+}
+
+
+int  do_read(int fd, int len, char *text) {
+    int block_index = openfilelist[fd].first;
+    /*读写指针*/
+    unsigned char *p = block_index * BLOCKSIZE + myvhard;
+    int block_num =len%BLOCKSIZE==0?(len/BLOCKSIZE):(len / BLOCKSIZE + 1);
+    int i, j, k = 0;
+    //可能占据了多个盘块
+    for (i = 0; i &lt; block_num; i++) {
+        for (j = 0; j &lt; BLOCKSIZE &amp;&amp; k &lt; len; j++, k++, p++)text[k] = *p;
+        p = myvhard + BLOCKSIZE * (fat1[block_index].id);
+        block_index = fat1[block_index].id;
+    }
+    return k;
+}
+
+int do_write(int fd, char *text, int len, int wstyle) {
+    if (wstyle != 0&amp;&amp; wstyle != 1)return -1;
+    int index = openfilelist[fd].first;
+    unsigned char *p = index * BLOCKSIZE + myvhard;
+    int block_num = getblocknum_fromfilelen(len);
+    int i, j, k = 0;
+    if (wstyle == 0) {
+        for (i = 0; i &lt; block_num; ++i) {
+            for (j = 0; j &lt; BLOCKSIZE &amp;&amp; k &lt; len; ++j, ++k,++p)*p = text[k];
+            p = myvhard + BLOCKSIZE * (fat1[index].id);
+            index = fat1[index].id;
+        }
+    }
+    else {
+      int i;
+        int file_len = openfilelist[fd].length;
+        for (i = 0; i &lt; file_len; ++i)++p;
+        int new_file_len = file_len + len;
+        int old_block = getblocknum_fromfilelen(file_len);
+        int new_block = getblocknum_fromfilelen(new_file_len);
+        check_enough_block(openfilelist[fd].first,new_block);
+        for (i = old_block; i &lt;= new_block; ++i) {
+            for (j = (file_len-1)%BLOCKSIZE; j &lt; BLOCKSIZE &amp;&amp; k &lt; len; ++j, ++k,++p)*p = text[k];
+            p = myvhard + BLOCKSIZE * (fat1[index].id);
+            index = fat1[index].id;
+        }
+    }
+    return k;
+}
+
+void showOpenFile() {
+    int i;
+    for (i = 0; i &lt; MAXOPENFILE; i++) {
+        if (openfilelist[i].topenfile == 1)
+            printf(&quot;%d %s\n&quot;, i, openfilelist[i].filename);
+    }
+}
+
+void my_exitsys() {
+    //for (int i = 0; i &lt; MAXOPENFILE; ++i) {
+    //  if (openfilelist[i].topenfile == 1 &amp;&amp; openfilelist[i].attribute == 1 &amp;&amp; openfilelist[i].fcbstate == 1)
+    //      update_fcb(i);
+    //}
+    FILE *fp;
+    fp = fopen(&quot;./my_fs&quot;, &quot;w&quot;);
+    fwrite(myvhard, SIZE, 1, fp);
+    free(myvhard);
+    fclose(fp);
+    exit(0);
+}
+
+void switcher(char *cmd) {
+    int fd;
+    char command[20];
+    if (!strcmp(cmd, &quot;help&quot;)) {
+        help();
+    }
+    else if (!strcmp(cmd, &quot;info&quot;)) {
+        info();
+    }
+    else if (!strcmp(cmd, &quot;mkdir&quot;)) {
+        scanf(&quot;%s&quot;, command);
+    if (strlen(command)&gt;=8) printf(&quot;目录名过长\n&quot;);
+      else  my_mkdir(command);
+    }
+    else if (!strcmp(cmd, &quot;rmdir&quot;)) {
+        scanf(&quot;%s&quot;, command);
+        my_rmdir(command);
+    }
+    else if (!strcmp(cmd, &quot;ls&quot;)) {
+        my_ls();
+    }
+    else if (!strcmp(cmd, &quot;cd&quot;)) {
+        scanf(&quot;%s&quot;, command);
+        my_cd(command);
+    }
+    else if (!strcmp(cmd, &quot;create&quot;)) {
+        scanf(&quot;%s&quot;, command);
+        if (strlen(command)&gt;=8) printf(&quot;文件名过长\n&quot;);
+        else my_create(command);
+    }
+    else if (!strcmp(cmd, &quot;write&quot;)) {
+        scanf(&quot;%d&quot;, &amp;fd);
+        my_write(fd);
+    }
+    else if (!strcmp(cmd,&quot;rm&quot;)) {
+        scanf(&quot;%s&quot;,command);
+        my_rm(command);
+    }
+    else if (!strcmp(cmd, &quot;read&quot;)) {
+        scanf(&quot;%d&quot;, &amp;fd);
+        my_read(fd, openfilelist[fd].length);
+    }
+    else if (!strcmp(cmd, &quot;ls&quot;)) {
+        scanf(&quot;%s&quot;, command);
+        my_rm(command);
+    }
+    else if (!strcmp(cmd, &quot;open&quot;)) {
+        scanf(&quot;%s&quot;, command);
+        my_open(command);
+    }
+    else if (!strcmp(cmd, &quot;close&quot;)) {
+        scanf(&quot;%d&quot;, &amp;fd);
+        my_close(fd);
+    }
+    else if (!strcmp(cmd, &quot;exit&quot;)) {
+        my_exitsys();
+        return;
+    }
+    else if (!strcmp(cmd, &quot;show&quot;)) {
+        showOpenFile();
+    }
+    else {
+        char c;
+        while (1) {
+            c = getchar();
+            if (c == &#39;\n&#39;) break;
+        }
+        printf(&quot;无效指令,请重新输入:\n&quot;);
+    }
+}
+
+int main(int argc, const char * argv[]) {
+    printf(&quot;*\t输入help以获取帮助!\n&quot;);
+    startsys();
+    char cmd[10];
+    while (1) {
+        printf(&quot;%s:$&quot;, currentdir);
+        scanf(&quot;%s&quot;, cmd);
+        switcher(cmd);
+    }
+    return 0;
+}
+
 </code></pre>
 <br /><br /><br /><br /><br />
 </div><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
