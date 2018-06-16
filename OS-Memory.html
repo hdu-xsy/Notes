@@ -1,0 +1,1033 @@
+<!DOCTYPE html><html>
+
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width; initial-scale=1.0; " name="viewport" /><title>Document</title>
+<style>
+@font-face {
+  font-family: octicons-anchor;
+  src: url(data:font/woff;charset=utf-8;base64,d09GRgABAAAAAAYcAA0AAAAACjQAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABGRlRNAAABMAAAABwAAAAca8vGTk9TLzIAAAFMAAAARAAAAFZG1VHVY21hcAAAAZAAAAA+AAABQgAP9AdjdnQgAAAB0AAAAAQAAAAEACICiGdhc3AAAAHUAAAACAAAAAj//wADZ2x5ZgAAAdwAAADRAAABEKyikaNoZWFkAAACsAAAAC0AAAA2AtXoA2hoZWEAAALgAAAAHAAAACQHngNFaG10eAAAAvwAAAAQAAAAEAwAACJsb2NhAAADDAAAAAoAAAAKALIAVG1heHAAAAMYAAAAHwAAACABEAB2bmFtZQAAAzgAAALBAAAFu3I9x/Nwb3N0AAAF/AAAAB0AAAAvaoFvbwAAAAEAAAAAzBdyYwAAAADP2IQvAAAAAM/bz7t4nGNgZGFgnMDAysDB1Ml0hoGBoR9CM75mMGLkYGBgYmBlZsAKAtJcUxgcPsR8iGF2+O/AEMPsznAYKMwIkgMA5REMOXicY2BgYGaAYBkGRgYQsAHyGMF8FgYFIM0ChED+h5j//yEk/3KoSgZGNgYYk4GRCUgwMaACRoZhDwCs7QgGAAAAIgKIAAAAAf//AAJ4nHWMMQrCQBBF/0zWrCCIKUQsTDCL2EXMohYGSSmorScInsRGL2DOYJe0Ntp7BK+gJ1BxF1stZvjz/v8DRghQzEc4kIgKwiAppcA9LtzKLSkdNhKFY3HF4lK69ExKslx7Xa+vPRVS43G98vG1DnkDMIBUgFN0MDXflU8tbaZOUkXUH0+U27RoRpOIyCKjbMCVejwypzJJG4jIwb43rfl6wbwanocrJm9XFYfskuVC5K/TPyczNU7b84CXcbxks1Un6H6tLH9vf2LRnn8Ax7A5WQAAAHicY2BkYGAA4teL1+yI57f5ysDNwgAC529f0kOmWRiYVgEpDgYmEA8AUzEKsQAAAHicY2BkYGB2+O/AEMPCAAJAkpEBFbAAADgKAe0EAAAiAAAAAAQAAAAEAAAAAAAAKgAqACoAiAAAeJxjYGRgYGBhsGFgYgABEMkFhAwM/xn0QAIAD6YBhwB4nI1Ty07cMBS9QwKlQapQW3VXySvEqDCZGbGaHULiIQ1FKgjWMxknMfLEke2A+IJu+wntrt/QbVf9gG75jK577Lg8K1qQPCfnnnt8fX1NRC/pmjrk/zprC+8D7tBy9DHgBXoWfQ44Av8t4Bj4Z8CLtBL9CniJluPXASf0Lm4CXqFX8Q84dOLnMB17N4c7tBo1AS/Qi+hTwBH4rwHHwN8DXqQ30XXAS7QaLwSc0Gn8NuAVWou/gFmnjLrEaEh9GmDdDGgL3B4JsrRPDU2hTOiMSuJUIdKQQayiAth69r6akSSFqIJuA19TrzCIaY8sIoxyrNIrL//pw7A2iMygkX5vDj+G+kuoLdX4GlGK/8Lnlz6/h9MpmoO9rafrz7ILXEHHaAx95s9lsI7AHNMBWEZHULnfAXwG9/ZqdzLI08iuwRloXE8kfhXYAvE23+23DU3t626rbs8/8adv+9DWknsHp3E17oCf+Z48rvEQNZ78paYM38qfk3v/u3l3u3GXN2Dmvmvpf1Srwk3pB/VSsp512bA/GG5i2WJ7wu430yQ5K3nFGiOqgtmSB5pJVSizwaacmUZzZhXLlZTq8qGGFY2YcSkqbth6aW1tRmlaCFs2016m5qn36SbJrqosG4uMV4aP2PHBmB3tjtmgN2izkGQyLWprekbIntJFing32a5rKWCN/SdSoga45EJykyQ7asZvHQ8PTm6cslIpwyeyjbVltNikc2HTR7YKh9LBl9DADC0U/jLcBZDKrMhUBfQBvXRzLtFtjU9eNHKin0x5InTqb8lNpfKv1s1xHzTXRqgKzek/mb7nB8RZTCDhGEX3kK/8Q75AmUM/eLkfA+0Hi908Kx4eNsMgudg5GLdRD7a84npi+YxNr5i5KIbW5izXas7cHXIMAau1OueZhfj+cOcP3P8MNIWLyYOBuxL6DRylJ4cAAAB4nGNgYoAALjDJyIAOWMCiTIxMLDmZedkABtIBygAAAA==) format('woff');
+}
+
+body {
+  background-color: white;
+}
+
+.markdown-body {
+  min-width: 200px;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px;
+
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  color: #333;
+  overflow: hidden;
+  font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+.markdown-body a {
+  background: transparent;;word-wrap: break-word; word-break: break-all;
+}
+
+.markdown-body a:active,
+.markdown-body a:hover {
+  outline: 0;
+}
+
+.markdown-body strong {
+  font-weight: bold;
+}
+
+.markdown-body h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+.markdown-body img {
+  border: 0;
+}
+
+.markdown-body hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+
+.markdown-body pre {
+  overflow: auto;
+}
+
+.markdown-body code,
+.markdown-body kbd,
+.markdown-body pre {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+.markdown-body input {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+
+.markdown-body html input[disabled] {
+  cursor: default;
+}
+
+.markdown-body input {
+  line-height: normal;
+}
+
+.markdown-body input[type="checkbox"] {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.markdown-body td,
+.markdown-body th {
+  padding: 0;
+}
+
+.markdown-body * {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.markdown-body input {
+  font: 13px/1.4 Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.markdown-body a {
+  color: #4183c4;
+  text-decoration: none;
+}
+
+.markdown-body a:hover,
+.markdown-body a:focus,
+.markdown-body a:active {
+  text-decoration: underline;
+}
+
+.markdown-body hr {
+  height: 0;
+  margin: 15px 0;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.markdown-body hr:before {
+  display: table;
+  content: "";
+}
+
+.markdown-body hr:after {
+  display: table;
+  clear: both;
+  content: "";
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  line-height: 1.1;
+}
+
+.markdown-body h1 {
+  font-size: 30px;
+}
+
+.markdown-body h2 {
+  font-size: 21px;
+}
+
+.markdown-body h3 {
+  font-size: 16px;
+}
+
+.markdown-body h4 {
+  font-size: 14px;
+}
+
+.markdown-body h5 {
+  font-size: 12px;
+}
+
+.markdown-body h6 {
+  font-size: 11px;
+}
+
+.markdown-body blockquote {
+  margin: 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body ol ol,
+.markdown-body ul ol {
+  list-style-type: lower-roman;
+}
+
+.markdown-body ul ul ol,
+.markdown-body ul ol ol,
+.markdown-body ol ul ol,
+.markdown-body ol ol ol {
+  list-style-type: lower-alpha;
+}
+
+.markdown-body dd {
+  margin-left: 0;
+}
+
+.markdown-body code {
+  font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.markdown-body pre {
+  margin-top: 0;
+  margin-bottom: 0;
+  font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.markdown-body kbd {
+  background-color: #e7e7e7;
+  background-image: -webkit-linear-gradient(#fefefe, #e7e7e7);
+  background-image: linear-gradient(#fefefe, #e7e7e7);
+  background-repeat: repeat-x;
+  border-radius: 2px;
+  border: 1px solid #cfcfcf;
+  color: #000;
+  padding: 3px 5px;
+  line-height: 10px;
+  font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  display: inline-block;
+}
+
+.markdown-body>*:first-child {
+  margin-top: 0 !important;
+}
+
+.markdown-body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+.markdown-body .anchor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  padding-right: 6px;
+  padding-left: 30px;
+  margin-left: -30px;
+}
+
+.markdown-body .anchor:focus {
+  outline: none;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  position: relative;
+  margin-top: 1em;
+  margin-bottom: 16px;
+  font-weight: bold;
+  line-height: 1.4;
+}
+
+.markdown-body h1 .octicon-link,
+.markdown-body h2 .octicon-link,
+.markdown-body h3 .octicon-link,
+.markdown-body h4 .octicon-link,
+.markdown-body h5 .octicon-link,
+.markdown-body h6 .octicon-link {
+  display: none;
+  color: #000;
+  vertical-align: middle;
+}
+
+.markdown-body h1:hover .anchor,
+.markdown-body h2:hover .anchor,
+.markdown-body h3:hover .anchor,
+.markdown-body h4:hover .anchor,
+.markdown-body h5:hover .anchor,
+.markdown-body h6:hover .anchor {
+  height: 1em;
+  padding-left: 8px;
+  margin-left: -30px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.markdown-body h1:hover .anchor .octicon-link,
+.markdown-body h2:hover .anchor .octicon-link,
+.markdown-body h3:hover .anchor .octicon-link,
+.markdown-body h4:hover .anchor .octicon-link,
+.markdown-body h5:hover .anchor .octicon-link,
+.markdown-body h6:hover .anchor .octicon-link {
+  display: inline-block;
+}
+
+.markdown-body h1 {
+  padding-bottom: 0.3em;
+  font-size: 2.25em;
+  line-height: 1.2;
+  border-bottom: 1px solid #eee;
+}
+
+.markdown-body h2 {
+  padding-bottom: 0.3em;
+  font-size: 1.75em;
+  line-height: 1.225;
+  border-bottom: 1px solid #eee;
+}
+
+.markdown-body h3 {
+  font-size: 1.5em;
+  line-height: 1.43;
+}
+
+.markdown-body h4 {
+  font-size: 1.25em;
+}
+
+.markdown-body h5 {
+  font-size: 1em;
+}
+
+.markdown-body h6 {
+  font-size: 1em;
+  color: #777;
+}
+
+.markdown-body p,
+.markdown-body blockquote,
+.markdown-body ul,
+.markdown-body ol,
+.markdown-body dl,
+.markdown-body table,
+.markdown-body pre {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.markdown-body hr {
+  height: 4px;
+  padding: 0;
+  margin: 16px 0;
+  background-color: #e7e7e7;
+  border: 0 none;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 2em;
+}
+
+.markdown-body ul ul,
+.markdown-body ul ol,
+.markdown-body ol ol,
+.markdown-body ol ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body li>p {
+  margin-top: 16px;
+}
+
+.markdown-body dl {
+  padding: 0;
+}
+
+.markdown-body dl dt {
+  padding: 0;
+  margin-top: 16px;
+  font-size: 1em;
+  font-style: italic;
+  font-weight: bold;
+}
+
+.markdown-body dl dd {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.markdown-body blockquote {
+  padding: 0 15px;
+  color: #777;
+  border-left: 4px solid #ddd;
+}
+
+.markdown-body blockquote>:first-child {
+  margin-top: 0;
+}
+
+.markdown-body blockquote>:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body table {
+  display: block;
+  width: 100%;
+  overflow: auto;
+  word-break: normal;
+  word-break: keep-all;
+}
+
+.markdown-body table th {
+  font-weight: bold;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+  padding: 6px 13px;
+  border: 1px solid #ddd;
+}
+
+.markdown-body table tr {
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+}
+
+.markdown-body table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.markdown-body code {
+  padding: 0;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(0,0,0,0.04);
+  border-radius: 3px;
+}
+
+.markdown-body code:before,
+.markdown-body code:after {
+  letter-spacing: -0.2em;
+  content: "\00a0";
+}
+
+.markdown-body pre>code {
+  padding: 0;
+  margin: 0;
+  font-size: 100%;
+  word-break: normal;
+  white-space: pre;
+  background: transparent;
+  border: 0;
+}
+
+.markdown-body .highlight {
+  margin-bottom: 16px;
+}
+
+.markdown-body .highlight pre,
+.markdown-body pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f7f7f7;
+  border-radius: 3px;
+}
+
+.markdown-body .highlight pre {
+  margin-bottom: 0;
+  word-break: normal;
+}
+
+.markdown-body pre {
+  word-wrap: normal;
+}
+
+.markdown-body pre code {
+  display: inline;
+  max-width: initial;
+  padding: 0;
+  margin: 0;
+  overflow: initial;
+  line-height: inherit;
+  word-wrap: normal;
+  background-color: transparent;
+  border: 0;
+}
+
+.markdown-body pre code:before,
+.markdown-body pre code:after {
+  content: normal;
+}
+
+.markdown-body .highlight {
+  background: #fff;
+}
+
+.markdown-body .highlight .mf,
+.markdown-body .highlight .mh,
+.markdown-body .highlight .mi,
+.markdown-body .highlight .mo,
+.markdown-body .highlight .il,
+.markdown-body .highlight .m {
+  color: #945277;
+}
+
+.markdown-body .highlight .s,
+.markdown-body .highlight .sb,
+.markdown-body .highlight .sc,
+.markdown-body .highlight .sd,
+.markdown-body .highlight .s2,
+.markdown-body .highlight .se,
+.markdown-body .highlight .sh,
+.markdown-body .highlight .si,
+.markdown-body .highlight .sx,
+.markdown-body .highlight .s1 {
+  color: #df5000;
+}
+
+.markdown-body .highlight .kc,
+.markdown-body .highlight .kd,
+.markdown-body .highlight .kn,
+.markdown-body .highlight .kp,
+.markdown-body .highlight .kr,
+.markdown-body .highlight .kt,
+.markdown-body .highlight .k,
+.markdown-body .highlight .o {
+  font-weight: bold;
+}
+
+.markdown-body .highlight .kt {
+  color: #458;
+}
+
+.markdown-body .highlight .c,
+.markdown-body .highlight .cm,
+.markdown-body .highlight .c1 {
+  color: #998;
+  font-style: italic;
+}
+
+.markdown-body .highlight .cp,
+.markdown-body .highlight .cs {
+  color: #999;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .cs {
+  font-style: italic;
+}
+
+.markdown-body .highlight .n {
+  color: #333;
+}
+
+.markdown-body .highlight .na,
+.markdown-body .highlight .nv,
+.markdown-body .highlight .vc,
+.markdown-body .highlight .vg,
+.markdown-body .highlight .vi {
+  color: #008080;
+}
+
+.markdown-body .highlight .nb {
+  color: #0086B3;
+}
+
+.markdown-body .highlight .nc {
+  color: #458;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .no {
+  color: #094e99;
+}
+
+.markdown-body .highlight .ni {
+  color: #800080;
+}
+
+.markdown-body .highlight .ne {
+  color: #990000;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .nf {
+  color: #945277;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .nn {
+  color: #555;
+}
+
+.markdown-body .highlight .nt {
+  color: #000080;
+}
+
+.markdown-body .highlight .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+}
+
+.markdown-body .highlight .gd {
+  color: #000;
+  background-color: #fdd;
+}
+
+.markdown-body .highlight .gd .x {
+  color: #000;
+  background-color: #faa;
+}
+
+.markdown-body .highlight .ge {
+  font-style: italic;
+}
+
+.markdown-body .highlight .gr {
+  color: #aa0000;
+}
+
+.markdown-body .highlight .gh {
+  color: #999;
+}
+
+.markdown-body .highlight .gi {
+  color: #000;
+  background-color: #dfd;
+}
+
+.markdown-body .highlight .gi .x {
+  color: #000;
+  background-color: #afa;
+}
+
+.markdown-body .highlight .go {
+  color: #888;
+}
+
+.markdown-body .highlight .gp {
+  color: #555;
+}
+
+.markdown-body .highlight .gs {
+  font-weight: bold;
+}
+
+.markdown-body .highlight .gu {
+  color: #800080;
+  font-weight: bold;
+}
+
+.markdown-body .highlight .gt {
+  color: #aa0000;
+}
+
+.markdown-body .highlight .ow {
+  font-weight: bold;
+}
+
+.markdown-body .highlight .w {
+  color: #bbb;
+}
+
+.markdown-body .highlight .sr {
+  color: #017936;
+}
+
+.markdown-body .highlight .ss {
+  color: #8b467f;
+}
+
+.markdown-body .highlight .bp {
+  color: #999;
+}
+
+.markdown-body .highlight .gc {
+  color: #999;
+  background-color: #EAF2F5;
+}
+
+.markdown-body .octicon {
+  font: normal normal 16px octicons-anchor;
+  line-height: 1;
+  display: inline-block;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.markdown-body .octicon-link:before {
+  content: '\f05c';
+}
+
+.markdown-body .task-list-item {
+  list-style-type: none;
+}
+
+.markdown-body .task-list-item+.task-list-item {
+  margin-top: 3px;
+}
+
+.markdown-body .task-list-item input {
+  float: left;
+  margin: 0.3em 0 0.25em -1.6em;
+  vertical-align: middle;
+}
+
+/*
+
+github.com style (c) Vasily Polovnyov <vast@whiteants.net>
+
+*/
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #333;
+  background: #f8f8f8;
+  -webkit-text-size-adjust: none;
+}
+
+.hljs-comment,
+.diff .hljs-header {
+  color: #998;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.css .rule .hljs-keyword,
+.hljs-winutils,
+.nginx .hljs-title,
+.hljs-subst,
+.hljs-request,
+.hljs-status {
+  color: #333;
+  font-weight: bold;
+}
+
+.hljs-number,
+.hljs-hexcolor,
+.ruby .hljs-constant {
+  color: #008080;
+}
+
+.hljs-string,
+.hljs-tag .hljs-value,
+.hljs-doctag,
+.tex .hljs-formula {
+  color: #d14;
+}
+
+.hljs-title,
+.hljs-id,
+.scss .hljs-preprocessor {
+  color: #900;
+  font-weight: bold;
+}
+
+.hljs-list .hljs-keyword,
+.hljs-subst {
+  font-weight: normal;
+}
+
+.hljs-class .hljs-title,
+.hljs-type,
+.vhdl .hljs-literal,
+.tex .hljs-command {
+  color: #458;
+  font-weight: bold;
+}
+
+.hljs-tag,
+.hljs-tag .hljs-title,
+.hljs-rule .hljs-property,
+.django .hljs-tag .hljs-keyword {
+  color: #000080;
+  font-weight: normal;
+}
+
+.hljs-attribute,
+.hljs-variable,
+.lisp .hljs-body,
+.hljs-name {
+  color: #008080;
+}
+
+.hljs-regexp {
+  color: #009926;
+}
+
+.hljs-symbol,
+.ruby .hljs-symbol .hljs-string,
+.lisp .hljs-keyword,
+.clojure .hljs-keyword,
+.scheme .hljs-keyword,
+.tex .hljs-special,
+.hljs-prompt {
+  color: #990073;
+}
+
+.hljs-built_in {
+  color: #0086b3;
+}
+
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-pi,
+.hljs-doctype,
+.hljs-shebang,
+.hljs-cdata {
+  color: #999;
+  font-weight: bold;
+}
+
+.hljs-deletion {
+  background: #fdd;
+}
+
+.hljs-addition {
+  background: #dfd;
+}
+
+.diff .hljs-change {
+  background: #0086b3;
+}
+
+.hljs-chunk {
+  color: #aaa;
+}
+
+
+</style>
+
+<style> @media print{ .hljs{overflow: visible; word-wrap: break-word !important;} }</style></head><body><div class="markdown-body yue">
+<h1 id="toc_0">存储器管理</h1>
+
+<h2 id="toc_1">存储器</h2>
+
+<h3 id="toc_2">多级存储器体系</h3>
+
+<p><code>多级存储器体系结构</code>是包含两个或两个以上容量、性能、价格不同的存储器，用硬件、软件或者两者相结合的方法协调起来组成多级存储器体系<br/><br/>
+<code>CPU寄存器</code>→临时存储区域[<code>高速缓存</code>(Cache)L1/L2/L3→<code>内存</code>&lt;物理内存、虚拟内存&gt;]→<code>永久存储区域</code>[ROM BIOS、移动存储、网络存储、硬盘]  </p>
+
+<pre><code>Cache:有效访问时间=命中率*访Cache时间+(1-命中率)*Cache不命中时花费的时间 即 TA=A·TC+(1-A)·(TC+TM)
+</code></pre>
+
+<h3 id="toc_3">存储器管理功能</h3>
+
+<ul>
+<li>内存的分配与回收</li>
+<li>内存的共享和保护<br/>
+<code>内存共享</code>是指进程共享访问某一段内存空间中的程序或者数据，<code>内存保护</code>是为了避免进程间的相互干扰，对内存中的进程和数据进行保护。</li>
+<li>地址映射<br/>
+编译器在对程序进行编译的时候，通常从0开始为程序代码编址，所以程序中涉及的地址都是相对地址0确定的，这种地址称为<code>虚地址</code>、<code>相对地址</code>或<code>逻辑地址</code>。相应的，这些地址构成的地址空间成为<code>虚地址空间</code>、<code>程序空间</code>或者<code>逻辑地址空间</code>。当程序加载到内存中时，通常都不会加载到从0开始的内存空间，程序在物理内存中的地址成为<code>实地址</code>、<code>绝对地址</code>或<code>物理地址</code>，构成的地址空间称为<code>实地址空间</code>、<code>内存空间</code>或<code>物理空间</code>。<br/>
+从虚地址映射到实际物理地址的地址转换功能称为<code>地址映射</code>，完成这个功能的部件称为<code>地址映射机构</code></li>
+<li>内存扩充<br/></li>
+</ul>
+
+<h3 id="toc_4">程序的装入和链接</h3>
+
+<ul>
+<li>静态链接<br/>
+程序装入内存执行前就讲目标模块与库模块链接成为一个完整的执行程序</li>
+<li>装入时动态链接<br/>
+目标模块的链接工作是在程序装入执行时边装入边链接的。</li>
+<li>运行时动态链接<br/>
+程序装入内存时仍然是目标模块，等执行到需要的模块或者库的时候才进行相应的链接。</li>
+<li>绝对装入<br/>
+将程序加载装入到某个指定地址开始的一段内存空间，该地址是在编译时就已经确定的</li>
+<li>静态重定位装入<br/>
+程序加载到内存中任一合适的位置，修改模块中各逻辑地址为统一物理地址空间中的实际物理地址</li>
+<li>动态重定位装入<br/>
+装入时各目标模块中依然使用逻辑地址，当真正执行指令时再将指令本身或指令中数据的逻辑地址转换成物理地址</li>
+</ul>
+
+<h2 id="toc_5">连续存储管理方式</h2>
+
+<p>为进程分配一段连续的物理内存空间，也就是将一维线性连续的虚地址空间映射到一维线性连续的实地址空间的方法</p>
+
+<h3 id="toc_6">固定分区</h3>
+
+<p>将物理内存空间划分为大小和数量都固定的若干分区，按照进程的请求分配分区，每个分区只能装入一个程序<br/><br/>
+使用分区分配表和相应的分配回收算法实现。<br/><br/>
+系统中可以容纳的并发进程的最大数量固定，碎片降低了内存利用率，凡事比最大尺寸大的进程都无法创建和执行</p>
+
+<h3 id="toc_7">可变分区</h3>
+
+<p>可变分区的分区大小和数量都是可以变化的，分配的时候根据进程需求分配大小合适的空间，回收的时候相邻分区可以合并成为较大的分区。</p>
+
+<ul>
+<li>分配算法
+
+<ul>
+<li>首次适应算法<br/>
+遍历空闲分区表的时候，第一次遇到可以满足需求的分区就进行必要的划分和分配。低端内存反复分配和回收可能出现小的难以利用的碎片空间，这种碎片是在分区之间，所以称为<code>外部碎片</code>。如果修改为每次从上一次分配的地方继续往后进行查找，直至空闲表结束再返回表的开始再查找，这称为<code>循环首次适应算法</code></li>
+<li>最佳适应算法<br/>
+在空闲分区表中根据分区大小查找与分配请求大小最接近的分区，进行划分和分配。</li>
+<li>最坏适应算法<br/>
+在空闲分区表中根据分区大小查找和分配请求大小相差最大的分区，进行划分和分配。</li>
+<li>伙伴分配算法，哈西算法，可重定位分区，对换</li>
+</ul></li>
+<li>回收算法<br/>
+当进程结束释放内存空间的时候，操作系统进行内存回收并标记相应分区为空闲状态。
+
+<ul>
+<li><code>上邻接</code>指的是待回收分区R在低端地址与另一个空闲分区F1相邻。回收R时，R与F1合并成为新的F1空闲分区，分区起始地址不变，仍为原来F1的起始地址，但是大小变为F1和R大小之和</li>
+<li> <code>下邻接</code>指的是待回收分区R在高端地址与另一个空闲分区F2相邻。回收R时，R与F2合并成为新的F2空闲分区，分区起始地址变为原来R的起始地址，大小变为F1和R大小之和</li>
+<li> <code>上下邻接</code>回收R时，R F1 F2合并成为新的F1空闲分区，分区的起始地址不变，仍为F1的起始地址，但是大小变为R、F1、F2大小只和，并且原来F2分区记录要从空闲分区表中删除，空闲分区表表目数量减一</li>
+<li> <code>无邻接</code>指的是R不与其他空闲分区相邻。回收R时，需要在合适的位置创建新的空闲分区表目，导致空闲分区表目数量加一。</li>
+</ul></li>
+</ul>
+
+<p><code>紧凑</code>是把各个进程移动到紧接着另一个进程后面的空间，这样原来不连续的空闲分区就成为高端内存连续的空间了。</p>
+
+<h2 id="toc_8">页式存储管理方式</h2>
+
+<h3 id="toc_9">页式存储管理基本原理</h3>
+
+<ul>
+<li>页与页框<br/>
+<code>页式存储管理</code>是将内存物理空间和程序逻辑空间分成大小相等的块，一般是2<sup>k</sup> B大小。在逻辑空间中的块称为<code>页面</code>，物理空间中的块称为物理块，或者<code>页框</code>和<code>帧</code>。</li>
+<li>逻辑地址结构<br/>
+页式系统的逻辑地址结构包括两部分：叶号P和页内位移量d(又称页内地址)。
+在进行地址映射的时候，需要根据给定的逻辑地址A计算得到页号PA和页内地址dA，P=INT[A/L] ，d=[A] mod L，L为页面大小</li>
+<li>页表
+在地址映射的时候需要知道页面对应的物理块，系统为每个进程设置了一张页号到物理块号的映射表，称为<code>页表</code>。页表的每个表项<code>PTE</code>由页号P与其对应的物理块号F组成，以页号为序建立。</li>
+<li>地址映射和越界保护<br/>
+判断页号是否超过页表长度</li>
+</ul>
+
+<p><code>物理地址A&#39; = 页面所对应的物理块号F * 页面大小L + 页内地址d</code></p>
+
+<h3 id="toc_10">快表</h3>
+
+<p>为了提高内存访问速度，通常会在地址映射机构中增加一个具有并行查找能力的高速缓冲存储器<code>快表</code>，也称为联想存储器TLB</p>
+
+<h3 id="toc_11">两级和多级页表</h3>
+
+<p>两级页表就是为进程的页表设置一张目录表，用以记录存放进程页面的物理块号，也称为外部页表，或者一级页表，进程自身的页表称为二级页表。二级页表分为三个部分，外部页号P1、外部页内地址P2和页内地址d。若页面大小为2<sup>k</sup> ，则页内地址d的位数为k，若页面可以存放页表项PTE的数量为2<sup>m</sup> ，则外部页内地址P2的位数为m。</p>
+
+<h2 id="toc_12">段式存储管理方式</h2>
+
+<ul>
+<li>段<br/>
+段式存储管理也属于离散存储器管理方式，但是其划分的单位是有逻辑意义的一组相关信息，称为<code>段</code>。每个段都有一个字符串标识符和一个唯一的编号，分别称为段名和段号，每个段都是从0开始连续编址，称为段内地址。</li>
+<li>逻辑地址结构<br/>
+段式存储管理的逻辑地址结构分为两个部分，低位0~15位是段内地址d，高位16~31位为段号S。段式逻辑地址空间是二维的非线性地址空间。段内地址d的位数决定了段的最大长度，段号d的位数决定了一个进程的段的最大数量。</li>
+<li>段表<br/>
+分段后的进程以段为单位装入内存，每个段装入一段连续的内存空间，但各段之间不要求连续，所以分段是离散方式的内存分配。为了访问段，需要建立一张段的映射表，记为各个段在内存中的起始地址（即<code>段基址</code>）和段长，称为<code>段表</code>，每个分段占一个表项，每个段表由段号、段长和段基址三部分构成，并按照段号排序。</li>
+<li>地址映射和越界保护<br/>
+段号不小于段表长度 段内地址超过段长</li>
+<li>段共享与保护<br/>
+为了实现段共享，可在系统中配置一张共享段表，每个共享段在共享段表中占一个表项。</li>
+</ul>
+
+<h2 id="toc_13">段页式存储管理方式</h2>
+
+<p>段页式存储管理首先将逻辑信息分为若干段，然后每个段再按系统规定的页面大小划分为若干页面。段页式的逻辑地址结构分为三个部分，段号S，段内页号P的页内地址d。<br/><br/>
+对逻辑地址A进行地址映射时，先根据段表始址和段号S检索段表找到相应的页表，然后根据页号P检索页表，获得物理块号F，最后F和页内地址d一起构成物理地址。  </p>
+
+<h2 id="toc_14">虚拟存储系统</h2>
+
+<h3 id="toc_15">虚拟存储器基本概念</h3>
+
+<p><code>虚拟存储器</code>是指具有请求调入功能和置换功能，能够利用外存储器的空余空间从逻辑上对内存容量进行扩充的一种存储器系统。</p>
+
+<ul>
+<li>时间局部性</li>
+<li>空间局部性</li>
+<li>将进程调入的一次性或者整体性改为多次性<br/>
+改变进程必须全部调入内存才能运行的方式，只将部分页面(段)装入内存就可启动运行，其余部分暂时存放在外存上，后续逐步调入需要使用的其他部分</li>
+<li>将进程的驻留性改为置换性<br/>
+改变进程一旦调入就一直驻留内存直到结束的方式，在需要的时候将暂时不用的部分换出到外存储器，换入运行所需要的部分。</li>
+</ul>
+
+<h3 id="toc_16">请求分页存储管理方式</h3>
+
+<ul>
+<li>页表<br/>
+
+<ul>
+<li>页号<br/></li>
+<li>物理块号<br/></li>
+<li>状态位P<br/>
+表示页面是否在内存</li>
+<li>访问字段A<br/>
+记录页面被访问的情况</li>
+<li>修改位M<br/>
+表示页面装入内存后是否被修改过</li>
+<li>外存地址<br/>
+存储页面在外存上的地址</li>
+</ul></li>
+<li>缺页中断机制<br/>
+在请求分页系统中，当所要访问的页面不在内存中时，地址映射机构讲产生<code>缺页中断</code> ，请求操作系统将所缺的页面调入内存。<br/>
+缺页中断处理需要经过保护中断现场，分析中断原因，转入中断处理程序，恢复中断现场等几个步骤</li>
+<li>地址映射机构<br/>
+在分页系统地址映射机构的基础上，增加了缺页中断产生及处理、页面换出和换入等功能。</li>
+<li>抖动/颠簸<br/>
+当系统内存过于缺乏的时候，就会频繁地进行页面的换入和换出，导致系统中任务的执行受到严重影响，这种反复频繁进行的页面置换称为<code>抖动</code>，即<code>系统颠簸</code></li>
+<li>工作集<br/>
+进程创建及运行时需要有一定数量的物理块分配，称为<code>工作集</code>，是在某段时间间隔内，进程要访问的页面集合。</li>
+<li>页面置换策略<br/>
+页面置换策略确定页面如何置换，包括三种策略：可变分配全局置换、可变分配局部置换和固定分配局部置换</li>
+<li>页面置换算法
+
+<ul>
+<li>缺页中断率f&#39;=不成功访问次数f/(成功访问次数s+f)</li>
+<li>f&#39;=f(r,m,p)</li>
+<li>最佳置换算法OPT<br/>
+选择将来永远不再访问的页面或者最长时间不会访问的页面进行淘汰，以降低缺页率</li>
+<li>先进先出置换算法FIFO<br/>
+淘汰最先调入内存的页面</li>
+<li>最近最久未使用置换算法LRU<br/>
+淘汰最近一段时间内最长没有被访问的页面</li>
+<li>最近最少使用置换算法LFU<br/>
+选择淘汰过去一段时间访问次数最少的页面</li>
+<li>时钟置换算法CLOCK(最近未用算法NRU)<br/>
+给每个页面关联一个访问位u，用以记录页面过去一段时间中被访问的情况。</li>
+</ul></li>
+</ul>
+
+<h2 id="toc_17">Linux内存管理机制</h2>
+<br /><br /><br /><br /><br />
+</div><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><script type="text/x-mathjax-config">MathJax.Hub.Config({TeX: { equationNumbers: { autoNumber: "AMS" } }});</script>
+</body>
+
+</html>
