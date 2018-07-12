@@ -29,6 +29,13 @@ red：部分primary shard不是active
 GET /_cat/indices?v
 ```
 
+* mapping
+
+
+```
+GET  /index/_mapping/type
+```
+
 * 增加索引
   
 
@@ -303,3 +310,56 @@ GET /index/type/_search {
 ```
 
 ## 结构化搜索term filter
+
+### 根据field的value搜索
+
+```
+GET /index/type/_search {
+  "query":{
+    "constant_score":{
+      "filter":{
+      "term": {“field":value}
+      }
+    }
+  }
+}
+```
+### 查看分词
+
+```
+GET /index/_analyzer
+{
+  "field":"field",
+  "text":value
+}
+```
+
+### not_analyzer 不分词
+
+```
+PUT /index
+{
+  "mappings":{
+    "type":{
+      "properties": {
+        "field":{
+          "type":"string",
+          "index":"not_analyzer"
+        }
+      }
+    }
+  }
+}
+```
+
+## 结构化搜索bitset机制和caching机制
+* 再倒排索引中查找搜索串，获取document list
+* 为每个在倒排索引中搜索到的结果，构建一个bitset，就是一个二进制的数组，用来标识
+* 遍历每个过滤条件对应的bitset，优先从最稀疏的开始搜索，查找满足所有条件的document
+* caching bitset，跟踪query，在最近256个query中超过一定次数的过滤次数，次数不固定，就会自动缓存这个filter对应的bitset，filter比query好在会caching
+* filter大部分情况在query之前执行过滤尽可能多数据，query会计算doc对搜索条件的relevance score，还会根据score排序，filter都不
+* document更改时 cached bitset自动更新
+* 以后只要有相同filter条件的，会直接来使用这个过滤条件对应的cached bitset
+
+
+## 结构化搜索bool组合多个filter条件来搜索数据

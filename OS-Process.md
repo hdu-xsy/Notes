@@ -119,9 +119,9 @@
      - 进程地址空间及文件系统信息
      - 进程信号管理相关信息
   - 进程创建
-     - fork()
-     - vfork()
-     - clone()
+     - fork() `创建一个普通进程，调用一次返回两次，在子进程中返回0，在父进程中返回子进程的pid`
+     - vfork() `子进程能共享父进程的地址空间，且父进程会一直阻塞，直到子进程调用exit()或调用exec()`
+     - clone() `接受一个指向某函数的指针和该函数的参数，刚创建的子进程将马上执行该函数。clone()允许子进程有选择性的继承父进程的资源，因此通常用它来创建线程`
      - do_fork()
   - 进程终止
   - 进程睡眠和唤醒
@@ -173,8 +173,22 @@
   - 内核信号量
   - 读写信号量
   - IPC信号量 （System V信号量）
+     - sem结构
+     - IPC信号量的相关系统调用
+         - int semget(key_t,int nsems,int semflag) `创建一个新的IPC信号量`
+         - int semop(int semid,struct sembuf *opsptr,size_t nops) `操作指定的IPC信号量`
+         - int semctl(int semid,int semnum,int cmd,union semun ag) `对IPC信号量实现控制操作`
   - Posix信号量
-
+     - 无名信号量
+       - int sem_init(sem_t *sem,int pshared,unsigned int value) `创建一个新的无名信号量，并进行初始化`
+       - int sem_getvalue(sem_t *sem,int *sval) `获取指定信号量当前值，并保存在sval中`
+       - int sem_wait(sem_t *sem) `阻塞型申请资源操作`
+       - int sem_post(sem_t *sem) `释放资源操作`
+       - int sem_destroy(sem_t *sem) `删除sem`
+     - 有名信号量
+        - sem_t *sem_open(const char *name,int oflag,mode_t mode,int value) `打开一个已存在的有名信号量或创建并初始化一个有名信号量，并将其引用计数+1`
+        - int sem_close(sem_t *sem) `关闭信号量`
+        - int sem_unlink(const char *name) `彻底删除信号量`
 ##进程调度
 - 进程调度的基本概念
   - 调度的层次
