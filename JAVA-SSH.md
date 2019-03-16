@@ -1,13 +1,11 @@
-### 目录  
+﻿### 目录  
  - [Spring](#Spring)  
  - [Hibernate](#Hibernate)  
  - [Struts2](#Struts2)  
  - [EL及JSTL](#ELJSTL)  
  - [AJAX](#AJAX)
  - [栅格与响应式](#BootStrap)
- - [websocket与netty框架](#websocket)
- - [shiro框架](#shiro)
- - [redis与缓存](#redis)
+ - [websocket](#websocket)
 ## <span id="Spring">Spring 框架</span>  
  - [Spring](#Spring)  
     - [Spring配置](#1)
@@ -960,7 +958,7 @@ visible-xs-block visible-lg-block 在超小屏幕和大屏幕上可见
 hidden-sm hidden-md 小屏幕和中等屏幕不可见
 visible-sm-block visible-md-block 在小屏幕和中等屏幕上可见
 ```
-## <span id="websocket">websocket与netty框架</span>
+## <span id="websocket">websocket</span>
 - websocket
     - 前端页面
     ```
