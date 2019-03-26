@@ -13,345 +13,6 @@ ES中，所有的文档在存储之前都要首先进行分析。用户可根据
 ES的“分片(shard)”机制可将一个索引内部的数据分布地存储于多个节点，它通过将一个索引切分为多个底层物理的Lucene索引完成索引数据的分割存储功能，这每一个物理的Lucene索引称为一个分片(shard)。每个分片其内部都是一个全功能且独立的索引，因此可由集群中的任何主机存储。创建索引时，用户可指定其分片的数量，默认数量为5个。 Shard有两种类型：primary和replica，即主shard及副本shard。Primary shard用于文档存储，每个新的索引会自动创建5个Primary shard，当然此数量可在索引创建之前通过配置自行定义，不过，一旦创建完成，其Primary shard的数量将不可更改。Replica shard是Primary Shard的副本，用于冗余数据及提高搜索性能。每个Primary shard默认配置了一个Replica shard，但也可以配置多个，且其数量可动态更改。ES会根据需要自动增加或减少这些Replica shard的数量。ES集群可由多个节点组成，各Shard分布式地存储于这些节点上。ES可自动在节点间按需要移动shard，例如增加节点或节点故障时。简而言之，分片实现了集群的分布式存储，而副本实现了其分布式处理及冗余功能。
 * 面向文档
 
-## 基本操作
-* 检测集群的健康状态
-
-```
-GET /_cat/health?v
-green：每个索引的primary shard和replica shard都是active状态
-yellow：部分replica shard不是active
-red：部分primary shard不是active
-```
-
-* 快速查看集群中有哪些索引
-
-```
-GET /_cat/indices?v
-```
-
-* mapping
-
-
-```
-GET  /index/_mapping/type
-```
-
-* 增加索引
-  
-
-```
-PUT /indexname?pretty
-```
-
-* 删除
-
-```
-DELETE /indexname?pretty
-```
-
-* 增
-
-```
-PUT /index/type/id{
-  "key"："value"
-}
-```
-
-* 查
-
-```
-GET /index/type/id
-```
-
-* 改
-
-```
-PUT /index/type/id{json} 必须包含全部field(覆盖)
-更新部分field：
-POST /index/type/id/_update {
-  "doc":{json}
-}
-```
-
-* 删
-
-```
-DELETE /index/type/id
-```
-
-## 搜索方式
-### query string search
-* 搜索全部  
-
-```
-GET /index/type/_search
-took：耗费毫秒数
-timed_out：是否超时
-_shards：数据拆成了五个分片，所以对于搜索请求，会打到所有的primary shard（或者是他的某个replica shard）
-hits.total：查询结果的数量
-hits.max_score：匹配分数，值越大匹配越高
-hits.hits：详细数据
-```
-
-* 搜索xx包含a且按yy降序排序
-
-```
-GET /index/type/_search?q=xx:a&sort=yy:desc
-
-```
-
-### query DSL
-
-```
-GET /index/type/_search {
-   "query":{query}
-}
-```
-
-* 查询所有
-
-```
-"query":{"match_all":{}}
-```
-
-* 查询xx包含a且按yy降序
-
-```
-“query": {
-    "match": {
-        "xx"="a"
-    }
-},
-"sort": [
-    {"yy":"desc"}
-]
-```
-
-* 分页查询，从a个商品开始查，查b个
-
-```
-”query":{"match_all":{}},
-"from":a,(从零开始计数)
-"size":b
-```
-
-* 投影运算
-
-```
-"query":{"match_all":{}},
-"_source":["xx","yy"]
-```
-
-### query filter
-* key包含value且key大于n
-
-```
-GET /index/type/_search {
-   "query":{
-     "bool":{
-       "must":{
-         "match":{
-           "key":"value"
-         }
-       },
-       "filter":{
-         "range":{
-           "key":{"gt",n}
-         }
-       }
-     }
-   }
-}
-```
-
-### full-text search 全文检索
-```
-GET /index/type/_search {
-  "query":{
-    "match":{
-      "key":"value"
-    }
-  }
-}
-```
-
-### phrase search 短语搜索
-```
-GET /index/type/_search {
-  "query":{
-    "match_phrase":{
-      "key":"value"
-    }
-  }
-}
-```
-### highlight search高亮搜索
-
-```
-GET /index/type/_search {
-  "query":{
-    "match":{
-      "key":"value"
-    }
-  },
-  "highlight":{
-    "fields":{
-      "key":{}
-    }
-  }
-}
-```
-
-## 聚合
-* 计算每个field下的value出现数量
-
-```
-GET /index/type/_search {
-  "aggs":{
-    "name":{
-      "terms":{"field":"field"}
-    }
-  }
-}
-```
-
-* 文本field的fielddata改为true
-
-```
-GET /index/_mapping/type {
-  "properties":{
-    "field":{
-      "type":"text",
-      "fielddata":true
-    }
-  }
-}
-```
-
-* 计算key为value的每个field下的value出现数量
-
-```
-GET /index/type/_search {
-  "size":0,
-  "query":{
-    "match":{
-      "key":"value"
-    }
-  },
-  "aggs":{
-    "name":{
-      "terms":{"field":"field"}
-    }
-  }
-}
-```
-
-* 按field的value分组计算key平均值  
-
-```
-GET /index/type/_search {
-  "aggs":{
-    "name":{
-      "terms":{"field":"field"},
-      "aggs": {
-        "name":{
-          "avg":{"field":"field"}
-        }
-      }
-    }
-  }
-}
-```  
-
-* 按field的value分组计算key平均值降序
-
-```
-GET /index/type/_search {
-  "size":0,
-  "aggs":{
-    "name":{
-      "terms":{"field":"field","order":{"name2":"desc"}},
-      "aggs": {
-        "name2":{
-          "avg":{"field":"field"}
-        }
-      }
-    }
-  }
-}
-```
-
-* 先按key的value分组后再按field的value分组计算key平均值
-
-```
-GET /index/type/_search {
-  "size":0,
-  "aggs":{
-    "name":{
-      "range":{
-        "key":"value",
-        "ranges":[
-          {"from":n,"to":m},……
-        ]
-      },
-      "aggs": {
-        "name":{
-          "terms":{"field":"field"},
-          "aggs":{
-            "name":{
-              "avg":{"field":"field"}
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-## 结构化搜索term filter
-
-### 根据field的value搜索
-
-```
-GET /index/type/_search {
-  "query":{
-    "constant_score":{
-      "filter":{
-      "term": {“field":value}
-      }
-    }
-  }
-}
-```
-### 查看分词
-
-```
-GET /index/_analyzer
-{
-  "field":"field",
-  "text":value
-}
-```
-
-### not_analyzer 不分词
-
-```
-PUT /index
-{
-  "mappings":{
-    "type":{
-      "properties": {
-        "field":{
-          "type":"string",
-          "index":"not_analyzer"
-        }
-      }
-    }
-  }
-}
-```
-
 ## 结构化搜索bitset机制和caching机制
 * 再倒排索引中查找搜索串，获取document list
 * 为每个在倒排索引中搜索到的结果，构建一个bitset，就是一个二进制的数组，用来标识
@@ -361,5 +22,540 @@ PUT /index
 * document更改时 cached bitset自动更新
 * 以后只要有相同filter条件的，会直接来使用这个过滤条件对应的cached bitset
 
+#索引
+##查看集群中索引
+GET /_cat/indices?v
 
-## 结构化搜索bool组合多个filter条件来搜索数据
+##mapping
+GET /my_index/_mapping/my_type
+##增加索引
+PUT /es_index?pretty
+
+##删除索引
+DELETE /test_index?pretty
+
+##创建索引
+#############################################################
+#Indices created in Elasticsearch 6.0.0 or later may only contain a single mapping type. Indices created in 5.x with multiple mapping types will continue to function as before in Elasticsearch 6.x. Mapping types will be completely removed in Elasticsearch 7.0.0.
+#############################################################
+PUT /my_index_v1
+{
+  "settings": {
+      "number_of_shards" :   5,
+      "number_of_replicas" : 1,
+      "analysis": {
+          "analyzer": {
+              "es_std": {
+                  "type":"standard"
+              }
+          }
+      }
+  },
+  "mappings": {
+    "my_type": {
+      "properties": {
+        "my_field":{
+          "type" : "keyword"
+        },
+        "timestamp": {
+            "type": "date",
+            "format": "strict_date_optional_time"
+        },
+        "text": {
+            "type": "text"
+        },
+         "first_name": {
+              "type":     "text",
+              "copy_to":  "full_name" 
+          },
+          "last_name": {
+              "type":     "text",
+              "copy_to":  "full_name" 
+          },
+          "full_name": {
+              "type":     "text"
+          }
+      }
+    }
+  }
+}
+
+##索引别名
+PUT /my_index_v1/_alias/my_index
+
+##查看别名
+GET /*/_alias/my_index
+GET /my_index_v1/_alias/*
+
+##零停机迁移索引
+POST /_aliases
+{
+    "actions": [
+        { "remove": { "index": "my_index_v1", "alias": "my_index" }},
+        { "add":    { "index": "my_index_v2", "alias": "my_index" }}
+    ]
+}
+
+#数据输入输出
+##增
+PUT /es_index/es_type/es_id
+{
+  "username":"admin",
+  "password":"admin"
+}
+
+##查
+GET /es_index/es_type/es_id
+
+##改
+POST /es_index/es_type/es_id/_update
+{
+  "doc":{
+    "password":"P@5$W0RD",
+    "id":1
+  }
+}
+
+##删
+DELETE /es_index/es_type/es_id
+
+#测试用例数据
+PUT /hdu?pretty
+PUT /hdu/se/SJJG
+{
+  "s_number":44,
+  "t_name":"XiaoWang",
+  "class":"6-111",
+  "time":["1-34","4-345","5-89"]
+}
+GET /hdu/se/GJJG
+PUT /hdu/se/JSJZCYL
+{
+  "s_number":33,
+  "t_name":"XiaoWang",
+  "class":"11-121",
+  "time":["2-89","4-12"]
+}
+PUT /hdu/se/SJKYL
+{
+  "s_number":22,
+  "t_name":"XiaoWang",
+  "class":"12-111",
+  "time":["1-67"]
+}
+PUT /hdu/se/JavaEE
+{
+  "s_number":55,
+  "t_name":"XiaoChen",
+  "class":"6-111",
+  "time":["1-67","3-345","4-89"]
+}
+
+#Query String Search
+##搜索全部
+GET /hdu/se/_search
+
+## 搜索xx包含且按yy降序排序
+GET /hdu/se/_search?q=t_name:XiaoWang&sort=s_number:desc
+
+#QueryDSL
+## 查询所有
+GET /hdu/se/_search 
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+## 查询xx包含a且按yy降序排序
+GET /hdu/se/_search 
+{
+  "query": {
+    "match": {
+      "t_name":"XiaoWang"
+    }
+  },
+  "sort":
+    {"s_number":"desc"}
+}
+
+## 分页查询 从a个商品开始查 查b个
+GET /hdu/se/_search 
+{
+  "query": {
+    "match_all": {}
+  },
+  "from": 0,
+  "size": 1
+}
+
+## 投影运算
+GET /hdu/se/_search 
+{
+  "query": {
+    "match_all": {}
+  },
+  "_source":["s_number","t_name"]
+}
+
+#Query Filter
+## FIELE包含TEXT 且 FIELE 大于n
+GET /hdu/se/_search 
+{
+  "query": {
+    "bool": {
+      "must": {
+          "match": {
+            "t_name":"XiaoWang"
+          }
+      },
+      "filter": { 
+        "range":{
+          "s_number":{"gt",33}
+        }
+      }
+    }
+  }
+}
+
+#Full-Text Search 全文检索
+GET /hdu/se/_search 
+{
+  "query": {
+    "match": {
+      "time":"34 89"
+    }
+  }
+}
+
+#Phrase Search 短语搜索
+GET /hdu/se/_search 
+{
+  "query": {
+    "match_phrase": {
+      "time": "34"
+    }
+  }
+}
+
+#Highlight Search 高亮搜索
+GET /hdu/se/_search 
+{
+  "query": {
+    "match_all": {}
+  },
+  "highlight": {
+    "fields": {
+      "t_name": {}
+    }
+  }
+}
+
+#聚合
+##文本field的fielddata改为true
+GET /hdu/_mapping/se 
+{
+  "properties":{
+    "t_name":{
+      "type":"text",
+      "fielddata":true
+    }
+  }
+}
+
+##计算field下的所有Value出现次数
+GET /hdu/se/_search 
+{
+  "size":0,
+  "aggs": {
+    "name": {
+      "terms": {
+        "field": "s_number"
+      }
+    }
+  }
+}
+
+## 计算field为TEXT的每个field的Value出现次数
+GET /hdu/se/_search
+{
+  "size": 0,
+  "query": {
+    "match": {
+      "t_name": "XiaoWang"
+    }
+  },
+  "aggs": {
+    "NAME": {
+      "terms": {"field": "s_number"}
+    }
+  }
+}
+
+## 按FIELD1分组计算FIELD2的平均值,并排序
+GET hdu/se/_search
+{
+  "size": 0, 
+  "aggs":{
+    "name":{
+      "terms": {
+        "field": "t_name","order": {
+          "_term": "desc"
+        }
+      },
+      "aggs":{
+        "name":{
+          "avg": {
+            "field": "s_number"
+          }
+        }
+      }
+    }
+  }
+}
+
+## 先取范围再分组再计算平均值
+GET /hdu/se/_search
+{
+  "size": 0,
+  "aggs": {
+    "NAME": {
+      "range": {
+        "field":"s_number",
+        "ranges": [
+          {"from": 0,"to": 100}
+        ]
+      },
+      "aggs": {
+        "NAME": {
+          "terms": {
+            "field": "t_name"
+          },
+          "aggs":{
+            "name":{
+              "avg": {
+                "field": "s_number"
+              }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+#结构化搜索Term Filter
+## 根据Field的Value搜索
+GET /hdu/se/_search
+{
+  "query": {
+    "constant_score": {
+      "filter": {
+        "term": {
+          "time": "89"
+        }
+      }
+    }
+  }
+}
+
+## 查看分词
+GET /hdu/_analyze
+{
+  "field": "class", 
+  "text": "1-111"
+}
+
+## not_analyzer 不分词
+PUT /hdu
+{
+  "mappings": {
+    "se": {
+      "properties": {
+        "class":{
+            "type" : "keyword"
+        }
+      }
+    }
+  }
+}
+
+# 结构化搜索bool组合多个filter条件来搜索数据
+## 搜索xx为aa或者yy为bb同时zz不为cc的type
+GET /hdu/se/_search 
+{
+  "query":{
+    "constant_score":{
+      "filter": {
+        "bool": {
+          "should":[
+            {"term":{"t_name":"XiaoWang"}},
+            {"term":{"class":"6-111"}}
+          ],
+          "must_not":{
+            "term":{"class":"7-111"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+# 结构化搜索 范围
+GET /hdu/se/_search
+{
+    "query" : {
+        "constant_score" : {
+            "filter" : {
+                "range" : {
+                    "s_number" : {
+                        "gte" : 20,
+                        "lt"  : 40
+                    }
+                }
+            }
+        }
+    }
+}
+
+# 结构化搜索 缺失搜索
+GET /hdu/se/_search
+{
+    "query" : {
+        "constant_score" : {
+            "filter": {
+                "missing" : { "field" : "class" }
+            }
+        }
+    }
+}
+
+#全文搜索 提高精度
+GET /hdu/se/_search
+{
+    "query": {
+        "match": {
+            "time": {      
+                "query":"4 345",
+                "operator": "and"
+            }
+        }
+    }
+}
+
+#全文搜索 控制精度
+GET /hdu/se/_search
+{
+  "query": {
+    "match": {
+      "time": {
+        "query":"1 4 67 89",
+        "minimum_should_match": "75%"
+      }
+    }
+  }
+}
+
+# 全文搜索bool组合查询 控制精度
+GET /hdu/se/_search
+{
+  "query": {
+    "bool": {
+      "must":     { "match": { "class": "6-111" }},
+      "must_not": { "match": { "t_name": "XiaoChen"  }},
+      "should": [
+                  { "match": { "time":"1" }},
+                  { "match": { "time":"4" }},
+                  { "match": { "time":"67"}},
+                  { "match": { "time":"89"}}
+      ],
+      "minimum_should_match": 2
+    }
+  }
+}
+
+# 全文搜索 查询语句提升权重
+GET /_search
+{
+    "query": {
+        "bool": {
+            "must": {
+                "match": {  
+                    "time": {
+                        "query":"1 4",
+                        "operator": "and"
+                    }
+                }
+            },
+            "should": [
+                { "match": {
+                    "class": {
+                        "query": "6-111",
+                        "boost": 3 
+                    }
+                }},
+                { "match": {
+                    "class": {
+                        "query": "12-111",
+                        "boost": 2 
+                    }
+                }}
+            ]
+        }
+    }
+}
+
+# 最大化查询（Disjunction Max Query）
+GET /hdu/se/_search
+{
+    "query": {
+        "dis_max": {
+            "queries": [
+                { "match": { "time": "1 34" }},
+                { "match": { "class":"6-111" }}
+            ]
+        }
+    }
+}
+
+# Multi_Match （）
+GET /hdu/se/_search
+{
+  "query":{
+    "multi_match": {
+        "query":                "34",
+        "type":                 "best_fields", 
+        "fields":               [ "class", "time" ],
+        "tie_breaker":           0.3,
+        "minimum_should_match": "30%" 
+    }
+  }
+}
+
+#近似匹配
+##短语匹配 （相邻）
+GET /hdu/se/_search
+{
+  "query": {
+    "match_phrase": {
+      "time": "4 89"
+    }
+  }
+}
+
+##slop 参数 （相隔多远时仍然能将文档视为匹配）
+GET /hdu/se/_search
+{
+    "query": {
+        "match_phrase": {
+            "time": {
+                "query": "4 89",
+                "slop":  1
+            }
+        }
+    }
+}
+
+## 
+
